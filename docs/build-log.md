@@ -45,3 +45,7 @@
 - Removed the copied OAuth token from the ignored local environment file; the launcher now loads the credential from the existing OS-backed GitLab sign-in.
 - Added recovery for retries when a rollout MR already exists remotely but the local event was not recorded.
 - Added a regression test proving retries reuse the MR without creating another commit.
+
+- Verified the local API recovers the original live GitLab rollout MR and records its link.
+- Browser testing exposed Turbopack watching mutable runtime files; excluded configured scanner/data paths from build tracing to stop repeated full-page reloads.
+- Thirteen backend/scanner tests and TypeScript checks passed.
