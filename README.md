@@ -16,6 +16,10 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 
 **Integration status:** GitLab and Duo need your namespace, permissions and credentials. Live external operation has not yet been verified in a hackathon namespace. Local scanner execution is verified. Rule synthesis from Duo currently opens a reviewable session; importing its proposed YAML remains an explicit operator step. No fabricated integration success or detector-accuracy scores are displayed.
 
+## Interface
+
+![Actual validation evidence from a controlled browser test](docs/screenshots/evidence-desktop.png)
+
 ## Local setup
 
 Requirements: Node.js 24+, npm, Python 3.11+ and [uv](https://docs.astral.sh/uv/).
