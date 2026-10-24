@@ -89,7 +89,7 @@ docker run --rm -p 8080:8080 --env-file .env.local \
 
 Provide ACCESS_TOKEN and HTTPS when exposing it beyond localhost. The application is single-operator software. The Dockerfile is prepared but container execution depends on an available Docker runtime.
 
-**Google Cloud Run:** compatible container interface, but durable Cloud Run deployment requires replacing SQLite with a durable database. Do not deploy this unchanged and promise persistent history. No cloud resources have been provisioned.
+**Google Cloud Run:** compatible container interface, but use `ANTIBODY_STORE=firestore` for durable cloud persistence. The adapter uses runtime service-account credentials. Live cloud persistence must still be verified in the selected project. No cloud resources have been provisioned.
 
 ## Repository structure
 
@@ -98,7 +98,7 @@ src/app/                  Marketing, workspace and HTTP routes
 src/components/           Workspace, incident creation and shared UI
 src/lib/model.ts          Input validation and domain types
 src/lib/engine.ts         Real scanner execution and evidence transitions
-src/lib/store.ts          SQLite persistence
+src/lib/store.ts          SQLite / Firestore persistence
 src/lib/gitlab.ts         Rollout and Duo REST adapters
 .gitlab/flows/            Duo custom flow definition
 .gitlab-ci.yml            Project verification pipeline
@@ -118,3 +118,13 @@ Intended entry: GitLab Life After Code, Start Fresh / Supervised. The central sp
 ## License
 
 MIT. See LICENSE.
+
+### Confirmed-project cloud deployment
+
+`scripts/deploy-cloud-run.sh PROJECT_ID REGION` prepares a runtime service account, Firestore, protected secrets, container build and Cloud Run service. It requires authenticated gcloud and glab. It creates billable cloud resources only in the explicit project argument. It never prints tokens; the generated workspace password is stored in a private local configuration file. Public landing access does not bypass the application access gate. The script is prepared; the selected target is `gather-483dd`, whose billing must be enabled before execution. The runtime uses a dedicated `antibody` database with database-scoped IAM.
+
+## Live integration status
+
+GitLab source is synchronized to https://gitlab.com/antibody-group1/Antibody-project.
+A real, unmerged rollout was created at https://gitlab.com/antibody-group1/Antibody-project/-/merge_requests/1.
+GitLab accepted the CI configuration as valid, but the first pipeline was blocked because the user account is not verified. Duo catalog creation returned a permission/resource error; synthesis is not yet live-verified. Google Cloud project `gather-483dd` is accessible but billing is disabled; no cloud deployment is claimed.

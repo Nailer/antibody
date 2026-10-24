@@ -12,7 +12,7 @@ export async function gitlab(path: string, options: RequestInit = {}) {
   const res = await fetch(`${base}/api/v4${path}`, {
     ...options,
     headers: {
-      "PRIVATE-TOKEN": token,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -61,7 +61,10 @@ export async function createRollout(a: Antibody) {
   const base = process.env.GITLAB_URL || "https://gitlab.com";
   const current = await fetch(
     `${base}/api/v4/projects/${p}/repository/files/${encodeURIComponent(".gitlab-ci.yml")}?ref=${encodeURIComponent(target)}`,
-    { headers: { "PRIVATE-TOKEN": token }, signal: AbortSignal.timeout(25000) },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(25000),
+    },
   );
   if (current.ok) {
     const file = await current.json();
@@ -73,6 +76,16 @@ export async function createRollout(a: Antibody) {
     );
   if (typeof config !== "object" || Array.isArray(config))
     throw new Error("Existing CI configuration must be a YAML mapping.");
+  // A custom stage list overrides GitLab defaults; ensure the new job can run.
+  if (config.stages !== undefined) {
+    if (
+      !Array.isArray(config.stages) ||
+      !config.stages.every((stage) => typeof stage === "string")
+    )
+      throw new Error("Existing CI stages must be a list of stage names.");
+    if (!config.stages.includes("test"))
+      config.stages = [...config.stages, "test"];
+  }
   const existing = config.include;
   const includes =
     existing === undefined

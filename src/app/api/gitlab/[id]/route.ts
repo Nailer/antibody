@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const a = getAntibody(id);
+  const a = await getAntibody(id);
   if (!a) return Response.json({ error: "Not found" }, { status: 404 });
   try {
     const { action } = await req.json();
@@ -28,7 +28,7 @@ export async function POST(
       });
     const result =
       action === "rollout" ? await createRollout(a) : await synthesize(a);
-    updateAntibody(id, (x) =>
+    await updateAntibody(id, (x) =>
       x.events.push({
         at: new Date().toISOString(),
         message: `${action === "rollout" ? "GitLab rollout MR created" : "Duo synthesis session started"}: ${result.url}`,

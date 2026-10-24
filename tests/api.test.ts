@@ -45,7 +45,7 @@ test("unvalidated evidence cannot be approved or exported, and approved packs ca
     (await download(new Request("http://localhost"), ctx("rule"))).status,
     409,
   );
-  updateAntibody(a.id, (x) => {
+  await updateAntibody(a.id, (x) => {
     x.status = "validated";
     x.checks = [
       { name: "bad", passed: true, detail: "executed" },
