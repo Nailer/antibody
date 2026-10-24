@@ -37,3 +37,11 @@
 
 - Live bearer-authenticated GitLab API and rollout MR creation succeeded (MR !1); the proposed check remains unmerged.
 - GitLab CI lint passed. Pipeline failure reason is account verification, before any jobs could start.
+
+## Local-first continuation (25 October 2026)
+
+- Deferred Google Cloud deployment at the user's request; no billing or cloud resource changes made.
+- Added a loopback-only local launcher with persistent SQLite, scanner checks and optional Git credential-helper integration.
+- Removed the copied OAuth token from the ignored local environment file; the launcher now loads the credential from the existing OS-backed GitLab sign-in.
+- Added recovery for retries when a rollout MR already exists remotely but the local event was not recorded.
+- Added a regression test proving retries reuse the MR without creating another commit.

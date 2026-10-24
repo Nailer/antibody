@@ -14,7 +14,7 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 - Server-side GitLab adapters for rollout MRs and real Duo synthesis sessions.
 - Maintained Python Requests TLS detector as a labelled starting example.
 
-**Integration status:** GitLab and Duo need your namespace, permissions and credentials. Live external operation has not yet been verified in a hackathon namespace. Local scanner execution is verified. Rule synthesis from Duo currently opens a reviewable session; importing its proposed YAML remains an explicit operator step. No fabricated integration success or detector-accuracy scores are displayed.
+**Integration status:** A real rollout MR has been created in the configured GitLab project. GitLab CI is blocked by account verification, and Duo catalog creation is blocked by namespace permissions. Local scanner execution is verified. Rule synthesis from Duo currently opens a reviewable session; importing its proposed YAML remains an explicit operator step. No fabricated integration success or detector-accuracy scores are displayed.
 
 ## Interface
 
@@ -27,10 +27,12 @@ Requirements: Node.js 24+, npm, Python 3.11+ and [uv](https://docs.astral.sh/uv/
 ```bash
 ./scripts/setup.sh
 cp .env.example .env.local
-npm run dev
+npm run local
 ```
 
-Open http://127.0.0.1:3000. Start in an empty workspace, select **New antibody**, and optionally choose **Use TLS example** to fill editable fixtures. Upload Python files if you want exposure results. Create the draft, run validation, inspect results and approve the pack.
+Open http://127.0.0.1:3100/app. Start in an empty workspace, select **New antibody**, and optionally choose **Use TLS example** to fill editable fixtures. Upload Python files if you want exposure results. Create the draft, run validation, inspect results and approve the pack.
+
+Google Cloud, a billing account and a credit card are not required for local operation. `npm run local` binds to your computer only, selects SQLite persistence and checks the scanner installation. Set `PORT` to change the local port. It loads `.env.local` and, if no explicit `GITLAB_TOKEN` is set, attempts to read your existing GitLab sign-in through Git's credential helper. Credentials stay in process memory. Local scanning and exports work even without GitLab credentials.
 
 The example is not prepopulated history. Uploaded fixtures are actually scanned. No incident code is executed.
 
