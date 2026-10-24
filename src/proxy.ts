@@ -5,7 +5,7 @@ export function proxy(req: NextRequest) {
     req.method !== "GET" &&
     req.method !== "HEAD" &&
     origin &&
-    origin !== req.nextUrl.origin
+    new URL(origin).host !== req.headers.get("host")
   )
     return NextResponse.json(
       { error: "Cross-origin requests are not permitted." },
