@@ -1,0 +1,14 @@
+stages: [verify]
+verify:
+  image: node:24-bookworm
+  stage: verify
+  before_script:
+    - apt-get update && apt-get install -y python3-venv
+    - python3 -m venv .venv
+    - .venv/bin/pip install semgrep==1.182.1
+    - npm ci
+  script:
+    - npm test
+    - npm run build
+  variables:
+    NEXT_TELEMETRY_DISABLED: "1"
