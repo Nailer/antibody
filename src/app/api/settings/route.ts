@@ -13,7 +13,10 @@ export async function GET() {
       process.env.GITLAB_PROJECT_ID
     ),
     gitlabUrl: process.env.GITLAB_URL || "https://gitlab.com",
-    storage: "SQLite · local persistent workspace",
+    storage:
+      process.env.ANTIBODY_STORE === "firestore"
+        ? "Firestore · durable cloud workspace"
+        : "SQLite · local persistent workspace",
     accessProtected: !!process.env.ACCESS_TOKEN,
   });
 }

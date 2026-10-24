@@ -22,3 +22,55 @@ test("unconfigured GitLab fails without claiming connection success", async () =
     if (old) process.env.GITLAB_TOKEN = old;
   }
 });
+test("rollout preserves existing CI and adds its required stage", async () => {
+  const { createRollout } = await import("../src/lib/gitlab");
+  const previousFetch = global.fetch;
+  const previousToken = process.env.GITLAB_TOKEN;
+  const previousProject = process.env.GITLAB_PROJECT_ID;
+  process.env.GITLAB_TOKEN = "test-token";
+  process.env.GITLAB_PROJECT_ID = "test/project";
+  let commit: { actions: { file_path: string; content: string }[] } | undefined;
+  global.fetch = (async (url, options) => {
+    const path = String(url);
+    if (path.includes("repository/files/"))
+      return Response.json({
+        content: Buffer.from(
+          "stages: [verify]\ninclude: {local: existing.yml}\n",
+        ).toString("base64"),
+      });
+    if (path.endsWith("repository/commits")) {
+      commit = JSON.parse(options?.body as string);
+      return Response.json({ id: "commit" });
+    }
+    if (path.endsWith("merge_requests"))
+      return Response.json({
+        web_url: "https://gitlab.com/test/project/-/merge_requests/1",
+      });
+    return Response.json({ default_branch: "main" });
+  }) as typeof fetch;
+  try {
+    await createRollout({
+      id: "unit-stage",
+      status: "approved",
+      title: "test rollout",
+      incident: "confirmed incident",
+      rule: "rules: []",
+      files: [],
+      findings: [],
+    } as unknown as import("../src/lib/model").Antibody);
+    const config = parse(
+      commit!.actions.find((a) => a.file_path === ".gitlab-ci.yml")!.content,
+    );
+    assert.deepEqual(config.stages, ["verify", "test"]);
+    assert.deepEqual(config.include, [
+      { local: "existing.yml" },
+      { local: ".antibody/unit-stage-ci.yml" },
+    ]);
+  } finally {
+    global.fetch = previousFetch;
+    if (previousToken === undefined) delete process.env.GITLAB_TOKEN;
+    else process.env.GITLAB_TOKEN = previousToken;
+    if (previousProject === undefined) delete process.env.GITLAB_PROJECT_ID;
+    else process.env.GITLAB_PROJECT_ID = previousProject;
+  }
+});

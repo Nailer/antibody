@@ -15,13 +15,25 @@
 - Production build and TypeScript passed; reviewed desktop and mobile screenshots.
 - Added installation, security, architecture, Docker and deployment-boundary documentation.
 
-## External dependencies still outstanding
-
-- GitLab namespace/project URL and authorized credentials are needed for a live Duo/rollout run.
-- A durable cloud database is required before promising persistent Google Cloud Run history.
-- Docker and gcloud executables are unavailable on this host; container/cloud execution is unverified.
-- GitLab group policies, automated source repair and multi-repository API discovery are outside this increment.
-
 - Verified the actual exported CI command exits 1 for a reintroduced defect and exits 0 for the corrected code.
 - Verified access-token challenges and cross-origin mutation rejection.
 - GitHub verification passed on the hardening increment.
+
+## Cloud integration preparation
+
+- Connected local GitLab remote to antibody-group1/Antibody-project; GitHub origin retained.
+- Installed official GitLab and Google Cloud CLIs. Google Cloud sign-in succeeded.
+- Supplied project number 88036897 is inaccessible in Google Cloud; requested the intended accessible project before creating resources.
+- Added a Firestore storage adapter and explicit-project Cloud Run deployment script. Live cloud validation is pending.
+
+## Live integration checks (24 October 2026)
+
+- Google Cloud project `gather-483dd` selected and accessible; billing is disabled, so no cloud resources were provisioned.
+- GitLab owner authentication verified and existing main history pushed to project 88036897.
+- GitLab Duo catalog flow creation currently returns a permission/resource error; no successful Duo run is claimed.
+- Added dedicated named Firestore database configuration and database-scoped runtime IAM in deployment preparation.
+- Eleven tests passed after asynchronous storage migration; production build passed.
+- Fixed rollout compatibility with projects that define a custom CI stage list and support OAuth bearer credentials.
+
+- Live bearer-authenticated GitLab API and rollout MR creation succeeded (MR !1); the proposed check remains unmerged.
+- GitLab CI lint passed. Pipeline failure reason is account verification, before any jobs could start.

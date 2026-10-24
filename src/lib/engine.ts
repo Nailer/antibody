@@ -86,13 +86,13 @@ export async function runSemgrep(
   }
 }
 export async function validateAntibody(id: string) {
-  const a = getAntibody(id);
+  const a = await getAntibody(id);
   if (!a) throw new Error("Antibody not found");
   if (a.status === "approved")
     throw new Error(
       "Approved packs are immutable. Create a new antibody to revise a rule.",
     );
-  updateAntibody(id, (x) => {
+  await updateAntibody(id, (x) => {
     x.status = "running";
     x.error = undefined;
     x.checks = [];
@@ -106,7 +106,7 @@ export async function validateAntibody(id: string) {
     const bad = await runSemgrep(a.rule, [
       { path: "bad.py", content: a.badCode },
     ]);
-    updateAntibody(id, (x) => {
+    await updateAntibody(id, (x) => {
       x.checks.push({
         name: "Known failure detected",
         passed: bad.length > 0,
@@ -116,7 +116,7 @@ export async function validateAntibody(id: string) {
     const fixed = await runSemgrep(a.rule, [
       { path: "fixed.py", content: a.fixedCode },
     ]);
-    updateAntibody(id, (x) => {
+    await updateAntibody(id, (x) => {
       x.checks.push({
         name: "Known fix accepted",
         passed: fixed.length === 0,

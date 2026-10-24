@@ -2,7 +2,7 @@
 
 ## Boundaries
 
-The browser supplies explicit incident data, Python snippets, and optional source files. It never receives GitLab tokens. The Node.js server validates input and persists records in SQLite. Semgrep runs in a temporary directory through execFile with argument arrays, a fixed locally installed scanner, time limits and bounded output. Uploaded code is never executed. Temporary files are removed after scanning.
+The browser supplies explicit incident data, Python snippets, and optional source files. It never receives GitLab tokens. The Node.js server validates input and persists records in SQLite locally or the dedicated Firestore database on Cloud Run. Semgrep runs in a temporary directory through execFile with argument arrays, a fixed locally installed scanner, time limits and bounded output. Uploaded code is never executed. Temporary files are removed after scanning.
 
 The UI is split into workspace navigation, incident form and shared presentation components. Domain models, persistence, scanner execution and GitLab adapters are separate modules.
 
@@ -28,4 +28,8 @@ SQLite uses WAL with a busy timeout. Persist .data on a local disk. Validations 
 
 ## Cloud Run
 
-The container can run on Cloud Run, but the bundled SQLite file is ephemeral there. Cloud Run deployment with durable history is not production-ready until the store is migrated to a supported durable database. Do not mount SQLite WAL onto an object-store filesystem. Local Docker with a persistent volume is the supported durable deployment in this version. No cloud resources are created by setup.
+A Firestore storage adapter is now available through `ANTIBODY_STORE=firestore`, using the runtime service account and transactional record updates. Local SQLite remains the default. Cloud records are limited to 750 KB so oversized incident/source uploads fail before the Firestore document limit. Live Firestore persistence still needs verification in the selected project.
+
+The container can run on Cloud Run, but the bundled SQLite file is ephemeral there. Cloud Run deployment with durable history must use the Firestore adapter and be verified after deployment. Do not mount SQLite WAL onto an object-store filesystem. Local Docker with a persistent volume is the supported durable deployment in this version. No cloud resources are created by setup.
+
+GitLab OAuth credentials are suitable for validating this integration. An unattended deployment requires a managed credential rotation strategy; copying a desktop OAuth access token does not provide automatic refresh in Cloud Run.

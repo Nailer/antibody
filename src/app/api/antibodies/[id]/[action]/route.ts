@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string; action: string }> },
 ) {
   const { id, action } = await params;
-  const a = getAntibody(id);
+  const a = await getAntibody(id);
   if (!a)
     return Response.json({ error: "Antibody not found" }, { status: 404 });
   if (action === "validate") {
@@ -30,7 +30,7 @@ export async function POST(
         { status: 409 },
       );
     return Response.json(
-      updateAntibody(id, (x) => {
+      await updateAntibody(id, (x) => {
         x.status = "approved";
         x.approvedAt = new Date().toISOString();
         x.events.push({
@@ -48,7 +48,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string; action: string }> },
 ) {
   const { id, action } = await params;
-  const a = getAntibody(id);
+  const a = await getAntibody(id);
   if (!a) return Response.json({ error: "Not found" }, { status: 404 });
   if (a.status !== "approved")
     return Response.json(

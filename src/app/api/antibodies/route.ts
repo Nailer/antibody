@@ -3,7 +3,7 @@ import { incidentInput } from "@/lib/model";
 import { listAntibodies, saveAntibody } from "@/lib/store";
 export const runtime = "nodejs";
 export async function GET() {
-  return Response.json(listAntibodies());
+  return Response.json(await listAntibodies());
 }
 export async function POST(req: Request) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       );
     const now = new Date().toISOString();
     return Response.json(
-      saveAntibody({
+      await saveAntibody({
         ...parsed.data,
         id: randomUUID(),
         createdAt: now,
