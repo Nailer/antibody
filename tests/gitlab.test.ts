@@ -32,6 +32,7 @@ test("rollout preserves existing CI and adds its required stage", async () => {
   let commit: { actions: { file_path: string; content: string }[] } | undefined;
   global.fetch = (async (url, options) => {
     const path = String(url);
+    if (path.includes("merge_requests?")) return Response.json([]);
     if (path.includes("repository/files/"))
       return Response.json({
         content: Buffer.from(
@@ -72,5 +73,40 @@ test("rollout preserves existing CI and adds its required stage", async () => {
     else process.env.GITLAB_TOKEN = previousToken;
     if (previousProject === undefined) delete process.env.GITLAB_PROJECT_ID;
     else process.env.GITLAB_PROJECT_ID = previousProject;
+  }
+});
+
+test("retrying rollout reuses its open MR without writing another commit", async () => {
+  const { createRollout } = await import("../src/lib/gitlab");
+  const priorFetch = global.fetch;
+  const priorToken = process.env.GITLAB_TOKEN;
+  const priorProject = process.env.GITLAB_PROJECT_ID;
+  process.env.GITLAB_TOKEN = "test-token";
+  process.env.GITLAB_PROJECT_ID = "test/project";
+  const methods: string[] = [];
+  global.fetch = (async (url, options) => {
+    methods.push(options?.method || "GET");
+    if (String(url).includes("merge_requests?"))
+      return Response.json([
+        { web_url: "https://gitlab.com/test/project/-/merge_requests/4" },
+      ]);
+    return Response.json({ default_branch: "main" });
+  }) as typeof fetch;
+  try {
+    const result = await createRollout({
+      id: "retry",
+      status: "approved",
+    } as import("../src/lib/model").Antibody);
+    assert.equal(
+      result.url,
+      "https://gitlab.com/test/project/-/merge_requests/4",
+    );
+    assert.deepEqual(methods, ["GET", "GET"]);
+  } finally {
+    global.fetch = priorFetch;
+    if (priorToken === undefined) delete process.env.GITLAB_TOKEN;
+    else process.env.GITLAB_TOKEN = priorToken;
+    if (priorProject === undefined) delete process.env.GITLAB_PROJECT_ID;
+    else process.env.GITLAB_PROJECT_ID = priorProject;
   }
 });

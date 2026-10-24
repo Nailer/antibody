@@ -4,7 +4,11 @@ export const runtime = "nodejs";
 export async function GET() {
   return Response.json({
     semgrep: existsSync(
-      resolve(process.env.SEMGREP_BIN || ".venv/bin/semgrep"),
+      /* turbopackIgnore: true */
+      resolve(
+        /* turbopackIgnore: true */ process.env.SEMGREP_BIN ||
+          ".venv/bin/semgrep",
+      ),
     ),
     gitlab: !!process.env.GITLAB_TOKEN,
     duo: !!(

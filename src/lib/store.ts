@@ -9,7 +9,9 @@ const collection = "antibody_records";
 export const usesCloudStore = () => process.env.ANTIBODY_STORE === "firestore";
 function database() {
   if (!db) {
-    const dir = resolve(process.env.ANTIBODY_DATA_DIR || ".data");
+    const dir = resolve(
+      /* turbopackIgnore: true */ process.env.ANTIBODY_DATA_DIR || ".data",
+    );
     mkdirSync(dir, { recursive: true, mode: 0o700 });
     db = new DatabaseSync(resolve(dir, "antibody.sqlite"));
     db.exec(

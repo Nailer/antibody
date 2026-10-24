@@ -42,7 +42,10 @@ export async function runSemgrep(
       await mkdir(dirname(dest), { recursive: true });
       await writeFile(dest, file.content, { mode: 0o600 });
     }
-    const binary = resolve(process.env.SEMGREP_BIN || ".venv/bin/semgrep");
+    const binary = resolve(
+      /* turbopackIgnore: true */ process.env.SEMGREP_BIN ||
+        ".venv/bin/semgrep",
+    );
     const { stdout } = await execute(
       binary,
       [

@@ -55,6 +55,10 @@ export async function createRollout(a: Antibody) {
   if (!target)
     throw new Error("GitLab project needs an initialized default branch.");
   const branch = `antibody/${a.id}`;
+  const existingMRs = await gitlab(
+    `/projects/${p}/merge_requests?state=opened&source_branch=${encodeURIComponent(branch)}&target_branch=${encodeURIComponent(target)}`,
+  );
+  if (existingMRs.length) return { url: existingMRs[0].web_url, branch };
   let config: Record<string, unknown> = {};
   let exists = false;
   const token = process.env.GITLAB_TOKEN!;

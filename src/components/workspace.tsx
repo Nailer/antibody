@@ -95,6 +95,11 @@ export default function Workspace() {
     void refresh();
   }, [refresh]);
   const active = items.find((a) => a.id === selected);
+  const rolloutUrl = active?.events
+    .find((event) =>
+      event.message.startsWith("GitLab rollout MR created: https://"),
+    )
+    ?.message.slice("GitLab rollout MR created: ".length);
   useEffect(() => {
     if (!items.some((a) => a.status === "running")) return;
     const timer = setInterval(() => void refresh(), 2500);
@@ -480,28 +485,41 @@ export default function Workspace() {
                           <code>.antibody/{active.id}.yml</code> and include the
                           exported CI job.
                         </p>
-                        <button
-                          className="button secondary full"
-                          disabled={busy || !settings?.gitlab}
-                          onClick={async () => {
-                            setBusy(true);
-                            try {
-                              const r = await request(
-                                `/api/gitlab/${active.id}`,
-                                { action: "rollout" },
-                              );
-                              setNotice(
-                                `GitLab merge request created: ${r.url}`,
-                              );
-                            } catch (e) {
-                              setError((e as Error).message);
-                            } finally {
-                              setBusy(false);
-                            }
-                          }}
-                        >
-                          Open rollout MR <ArrowUpRight size={15} />
-                        </button>
+                        {rolloutUrl ? (
+                          <a
+                            className="button secondary full"
+                            href={rolloutUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View rollout MR <ArrowUpRight size={15} />
+                          </a>
+                        ) : (
+                          <button
+                            className="button secondary full"
+                            disabled={busy || !settings?.gitlab}
+                            onClick={async () => {
+                              setBusy(true);
+                              try {
+                                const r = await request(
+                                  `/api/gitlab/${active.id}`,
+                                  { action: "rollout" },
+                                );
+                                await refresh();
+                                setNotice(
+                                  `GitLab merge request ready: ${r.url}`,
+                                );
+                              } catch (e) {
+                                setError((e as Error).message);
+                              } finally {
+                                setBusy(false);
+                              }
+                            }}
+                          >
+                            {busy ? "Preparing rollout…" : "Create rollout MR"}{" "}
+                            <ArrowUpRight size={15} />
+                          </button>
+                        )}
                       </>
                     ) : (
                       <button
