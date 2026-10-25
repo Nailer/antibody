@@ -170,3 +170,43 @@ test("rollout recovers an orphan branch only when rule, job and include match", 
     else process.env.GITLAB_PROJECT_ID = priorProject;
   }
 });
+test("Duo progress includes actual agent messages even when the role field is null", async () => {
+  const { getDuoSession } = await import("../src/lib/gitlab");
+  const original = global.fetch,
+    token = process.env.GITLAB_TOKEN;
+  process.env.GITLAB_TOKEN = "test";
+  global.fetch = (async () =>
+    Response.json({
+      data: {
+        duoWorkflowWorkflows: {
+          nodes: [
+            {
+              humanStatus: "finished",
+              webUrl:
+                "https://gitlab.com/team/project/-/automate/agent-sessions/42",
+              latestCheckpoint: {
+                errors: [],
+                duoMessages: [
+                  { role: null, messageType: "tool", content: "starting" },
+                  {
+                    role: null,
+                    messageType: "agent",
+                    content: "Proposed detector and limits",
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    })) as typeof fetch;
+  try {
+    const result = await getDuoSession(42);
+    assert.equal(result.status, "finished");
+    assert.equal(result.output, "Proposed detector and limits");
+  } finally {
+    global.fetch = original;
+    if (token === undefined) delete process.env.GITLAB_TOKEN;
+    else process.env.GITLAB_TOKEN = token;
+  }
+});

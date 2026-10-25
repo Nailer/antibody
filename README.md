@@ -16,7 +16,7 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 - Server-side GitLab adapters for rollout MRs and real Duo synthesis sessions.
 - Maintained Python Requests TLS detector as a labelled starting example.
 
-**Integration status:** A real rollout MR has been created in the configured GitLab project. GitLab CI is blocked by account verification, and Duo catalog creation is blocked by namespace permissions. Local scanner execution is verified. Rule synthesis from Duo currently opens a reviewable session; importing its proposed YAML remains an explicit operator step. No fabricated integration success or detector-accuracy scores are displayed.
+**Integration status:** The real custom Duo flow is enabled in the public hackathon project. Session 10020831 completed and proposed a detector; actual Semgrep validation passed all six supplied examples and found the controlled unsafe source. A real GitLab prevention job rejected the unsafe revision. See [live integration evidence](docs/evidence/README.md). Proposal review/import remains an explicit operator step. Deployment on Google Cloud is deferred.
 
 ## Interface
 
@@ -129,9 +129,15 @@ MIT. See LICENSE.
 
 ## Live integration status
 
-GitLab source is synchronized to https://gitlab.com/antibody-group1/Antibody-project.
-A real, unmerged rollout was created at https://gitlab.com/antibody-group1/Antibody-project/-/merge_requests/1.
-GitLab accepted the CI configuration as valid, but the first pipeline was blocked because the user account is not verified. Duo catalog creation returned a permission/resource error; synthesis is not yet live-verified. Google Cloud project `gather-483dd` is accessible but billing is disabled; no cloud deployment is claimed.
+Canonical public source: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase
+
+- [Completed Duo session](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/automate/agent-sessions/10020831).
+- [Reviewed detector rollout MR](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/merge_requests/2).
+- [Corrected revision accepted by the prevention job](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/jobs/17450507327).
+- [Unsafe revision rejected by the actual prevention job](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/jobs/17450487967).
+- [Source import verification pipeline](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/pipelines/2986882289) passed.
+
+The application can retrieve live Duo status and proposed output for review. The runtime uses read-only GitLab agent privileges for future sessions. Project merge-policy settings still require Maintainer access; a failed job is not represented as proof that GitLab prevents merging.
 
 ## Local backup and recovery
 

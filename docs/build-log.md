@@ -72,3 +72,17 @@
 
 - Final local verification: 21 backend/scanner tests passed; three browser workflows passed including invalid-detector recovery. Production build, TypeScript and formatting passed.
 - Reviewed repository evidence/source links at desktop and mobile widths; fixed off-screen mobile-navigation visibility and added Escape/expanded-state semantics.
+
+## Approved hackathon integration
+
+- Discovered the provisioned public showcase project 88074697 and preserved its original README/history through a reviewed source import MR.
+- Corrected live flow schema requirements: inline prompt unit primitives, input/template agreement and failure-event spelling. Removed the unused write-capable note tool.
+- Created catalog flow 1019702 and enabled consumer 13153303. Real session 10020831 completed; its executor job succeeded.
+- Added authenticated, bounded GraphQL retrieval of real agent output and observed progress. Agent messages with null roles are covered by a regression test.
+- Reviewed the actual generated rule and passed six Semgrep fixture checks; created rollout MR !2.
+- Proved actual GitLab CI rejection of the controlled unsafe revision (job 17450487967). Corrected revision is now in CI.
+- Maintainer-only project merge-policy change returned 403; no automatic merge-blocking claim is made.
+
+- Corrected commit 84bd63395c1a953dcea51f58b345a0f4b1a54f13 passed pipeline 2986896165 and prevention job 17450507327. Rollout MR !2 merged only after success.
+
+- Verified a second real session (10020978) started through the application itself with read-only agent privileges; observed finished state and actual proposal output through the new API/UI.

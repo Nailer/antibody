@@ -14,7 +14,6 @@ components:
       - get_issue
       - get_merge_request
       - get_repository_file
-      - create_issue_note
     ui_log_events:
       - on_agent_final_answer
       - on_tool_execution_success
@@ -35,4 +34,4 @@ prompts:
         Do not claim validation until actual Semgrep results are supplied. Never merge or deploy.
         Output proposed YAML and fixtures for explicit operator review in the session.
         When your proposed detector and limits are complete, return your final answer and stop.
-      user: "{{ goal }}"
+      user: "Project: {{ project_id }}\n{{ goal }}"

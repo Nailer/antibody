@@ -12,7 +12,7 @@ Draft → Running → Validated or Failed → Approved. A failed scan can be ret
 
 ## Evidence limits
 
-Two fixture checks are a minimal validation, not an accuracy estimate. Upload scanning reports matches rather than confirmed vulnerabilities. No unlabelled organization-wide corpus is used to assert a false-positive rate. The starter detector is deterministic, maintained and explicitly labelled; it is not AI-generated. Real Duo synthesis requires a configured flow and returns a reviewable GitLab session. Operator review remains explicit. The revision/import form preserves the original record and requires new validation and approval.
+Two fixture checks are a minimal validation, not an accuracy estimate. Upload scanning reports matches rather than confirmed vulnerabilities. No unlabelled organization-wide corpus is used to assert a false-positive rate. The starter detector is deterministic, maintained and explicitly labelled; it is not AI-generated. Real Duo synthesis uses a configured flow and returns a reviewable GitLab session. The approved hackathon namespace has completed a real proposal run; live GraphQL checkpoints provide observed status and agent output. Operator review remains explicit. The revision/import form preserves the original record and requires new validation and approval.
 
 ## GitLab rollout
 

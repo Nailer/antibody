@@ -87,7 +87,7 @@ export default function Home() {
       <footer>
         <span>Antibody</span>
         <span>Prevention is a practice.</span>
-        <a href="https://github.com/Nailer/antibody">
+        <a href="https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase">
           Source repository <ArrowUpRight size={14} />
         </a>
       </footer>
