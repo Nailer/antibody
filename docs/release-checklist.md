@@ -15,15 +15,15 @@ Updated 25 October 2026. This is a release checklist, not a claim that every gat
 
 ## External gates
 
-- [ ] GitLab account verification permits CI jobs to run.
-- [ ] Hackathon contributor onboarding provides the authorized Duo namespace/project.
-- [ ] Custom flow is created/enabled and produces a real detector proposal.
-- [ ] Real generated prevention pipeline fails for bad code and passes for corrected code.
-- [ ] Public GitLab source visibility confirmed, with MIT license and final run instructions.
+- [x] Hosted GitLab CI runs in the provisioned project.
+- [x] Contributor onboarding provides the authorized public showcase project.
+- [x] Custom flow enabled; session 10020831 produced the actual detector and fixtures.
+- [x] Actual generated prevention job failed on the unsafe commit and passed on the correction; rollout merged after success.
+- [x] Public GitLab source with MIT license and run instructions is available.
 - [ ] Final demo video recorded and published publicly on YouTube; under three minutes.
 - [ ] Devpost entry, team information, category and required links checked and submitted.
 
-The last live check reports account verification blocking GitLab pipelines and a permission/resource error on Duo catalog creation. These gates cannot be represented by GitHub CI or a mock Duo response.
+Duo and CI access are now verified in the approved hackathon namespace. Project merge-policy editing returns 403 with the assigned Developer role; do not claim merge blocking until a Maintainer enables the policy.
 
 ## Submission fit
 

@@ -7,14 +7,14 @@ Updated: 25 October 2026. Google Cloud is deferred. Continue with the local sing
 - Local SQLite history, real Semgrep validation, approval gates and exports work.
 - Real GitLab rollout MR creation and existing-MR recovery work.
 - Thirteen backend/scanner tests, two browser tests and the production build passed on the latest increment.
-- GitLab-hosted CI was blocked by account verification at the last live check.
-- Duo flow creation returned a permission/resource error at the last live check. A successful Duo synthesis run has not been demonstrated.
+- Hosted CI now runs successfully in the provisioned public hackathon project.
+- Real Duo session 10020831 completed; the generated detector passed six Semgrep fixture checks.
 
 ## P0 — complete the core product loop
 
 ### T01 — unblock GitLab CI and Duo access
 
-Status: externally blocked; recheck before requesting user action.
+Status: completed in the provisioned hackathon project. The public custom flow is enabled and the first actual session completed.
 
 - Recheck account verification, project permissions and Duo catalog eligibility using the signed-in account.
 - Validate the flow definition against the live platform and correct any schema or tool errors.
@@ -26,7 +26,7 @@ Done when: a real GitLab pipeline runs and a Duo session produces a reviewable d
 
 ### T02 — complete detector proposal review and import
 
-Status: review/import and structured session storage implemented. Live Duo acceptance depends on T01; remote session progress remains in GitLab.
+Status: completed and live-verified. Reviewed generated output was imported into a separate draft; live observed status and agent output are available in the application.
 
 - Persist a structured synthesis session ID, URL and state rather than relying on event text.
 - Show session progress, failures and a direct return link.
@@ -50,7 +50,7 @@ Done when: the operator can scan a real repository at a pinned commit without ma
 
 ### T04 — verify prevention in an actual GitLab pipeline
 
-Status: MR creation, retry/orphan recovery and live rollout-status inspection implemented. Hosted fail/pass enforcement remains blocked by T01.
+Status: real unsafe-revision failure and corrected-revision success verified in GitLab CI. Rollout MR merged after success. Merge-policy configuration still requires Maintainer access.
 
 - Test in a controlled repository with safe bad/fixed fixtures.
 - Run the generated prevention job against both revisions.
@@ -112,7 +112,7 @@ Done when: a fresh local setup can run the core flow without Google Cloud and re
 
 ### T09 — final integrated product QA
 
-Status: local release checks passed (21 backend/scanner tests, three browser workflows, production build and visual review). Live Duo/CI acceptance remains blocked.
+Status: local release checks passed (21 backend/scanner tests, three browser workflows, production build and visual review). Live Duo, actual unsafe-code rejection and corrected-code acceptance are verified.
 
 - Run core tests and browser checks after the last feature changes.
 - Exercise empty, loading, failed, interrupted, approved and rolled-out states.

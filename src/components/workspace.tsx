@@ -26,6 +26,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { type Antibody } from "@/lib/model";
+import DuoProgress from "./duo-progress";
 import RolloutStatus from "./rollout-status";
 import Create from "./create-antibody";
 import { PageHeading, Integration, ScanIcon } from "./workspace-ui";
@@ -223,7 +224,7 @@ export default function Workspace() {
             <br />A stronger next release.
           </p>
           <a
-            href="https://github.com/Nailer/antibody"
+            href="https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase"
             target="_blank"
             rel="noreferrer"
           >
@@ -359,7 +360,7 @@ export default function Workspace() {
                   connection.
                 </p>
                 <a
-                  href="https://github.com/Nailer/antibody"
+                  href="https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase"
                   className="text-link"
                 >
                   Read installation and deployment guidance{" "}
@@ -675,10 +676,12 @@ export default function Workspace() {
                       </p>
                       {active.synthesis ? (
                         <div>
-                          <p>
-                            Session #{active.synthesis.id} ·{" "}
-                            {active.synthesis.status} when started
-                          </p>
+                          <p>Session #{active.synthesis.id}</p>
+                          <DuoProgress
+                            key={active.synthesis.id}
+                            id={active.id}
+                            initial={active.synthesis}
+                          />
                           <a
                             className="button secondary full"
                             href={active.synthesis.url}
@@ -690,8 +693,8 @@ export default function Workspace() {
                           <p className="muted">
                             Review the result in GitLab, then use “Revise /
                             import reviewed proposal” to create a separate
-                            draft. Status is the last response received, not
-                            live progress.
+                            draft. Use Refresh Duo result to retrieve the latest
+                            observed state.
                           </p>
                         </div>
                       ) : (

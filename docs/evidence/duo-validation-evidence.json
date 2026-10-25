@@ -1,0 +1,71 @@
+{
+  "id": "8a30e277-dac5-4e49-b57b-75c2d8b8913d",
+  "title": "Reviewed Duo TLS prevention pack",
+  "approvedAt": "2026-10-25T17:47:42.322Z",
+  "checks": [
+    {
+      "name": "Known failure detected",
+      "passed": true,
+      "detail": "1 finding(s) in the incident fixture."
+    },
+    {
+      "name": "Known fix accepted",
+      "passed": true,
+      "detail": "0 finding(s) in the corrected fixture."
+    },
+    {
+      "name": "Example 1: POST with verification disabled",
+      "passed": true,
+      "detail": "Expected a match; observed a match."
+    },
+    {
+      "name": "Example 2: Generic Requests call with verification disabled",
+      "passed": true,
+      "detail": "Expected a match; observed a match."
+    },
+    {
+      "name": "Example 3: Trusted custom CA bundle",
+      "passed": true,
+      "detail": "Expected no match; observed no match."
+    },
+    {
+      "name": "Example 4: Default verification retained",
+      "passed": true,
+      "detail": "Expected no match; observed no match."
+    }
+  ],
+  "derivedFrom": "2bbfa1bd-33ae-41b7-89a3-1ce92227b25b",
+  "findings": [
+    {
+      "path": "services/legacy_client.py",
+      "line": 2,
+      "message": "A Requests call passes verify=False, which disables TLS certificate verification and allows machine-in-the-middle attacks. Use the default verification (verify=True or omit the argument). For a private CA, pass verify=\"/path/to/ca-bundle.pem\".",
+      "ruleId": "antibody.python.requests-verify-false"
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-10-25T17:47:22.494Z",
+      "message": "New draft derived from 2bbfa1bd-33ae-41b7-89a3-1ce92227b25b; original incident has Duo session 10020831; this revision is operator-supplied. Validation is required."
+    },
+    {
+      "at": "2026-10-25T17:47:22.584Z",
+      "runId": "4b335392-d55e-4a88-8044-b45ceda91b96",
+      "message": "Validation started: bad and fixed fixtures."
+    },
+    {
+      "at": "2026-10-25T17:47:42.257Z",
+      "runId": "4b335392-d55e-4a88-8044-b45ceda91b96",
+      "message": "Validation passed; scanned 2 supplied Python file(s)."
+    },
+    {
+      "at": "2026-10-25T17:47:42.322Z",
+      "message": "Operator approved this validated prevention pack. Export is available; rollout is not automatic."
+    },
+    {
+      "at": "2026-10-25T17:47:47.945Z",
+      "message": "GitLab rollout MR created: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/merge_requests/2"
+    }
+  ],
+  "limitations": "Validation covers supplied fixtures only. Scan findings require review; no organization-wide false-positive rate is established."
+}
