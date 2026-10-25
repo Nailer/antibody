@@ -8,7 +8,13 @@ import {
 } from "../src/lib/model";
 import { validateRuleText, runSemgrep } from "../src/lib/engine";
 test("rejects traversal and absolute source paths", () => {
-  for (const path of ["../secret.py", "/tmp/a.py", "x/../../a.py"])
+  for (const path of [
+    "../secret.py",
+    "/tmp/a.py",
+    "x/../../a.py",
+    "x/./a.py",
+    "x//a.py",
+  ])
     assert.equal(
       incidentInput.safeParse({
         title: "Incident",
@@ -54,5 +60,22 @@ test("a safe custom CA and unrelated verify keyword are accepted", async () => {
       ])
     ).length,
     0,
+  );
+});
+
+test("rejects duplicate paths rather than silently replacing scan inputs", () => {
+  assert.equal(
+    incidentInput.safeParse({
+      title: "Incident",
+      incident: "A confirmed TLS incident occurred.",
+      badCode: starterBad,
+      fixedCode: starterFixed,
+      rule: starterRule,
+      files: [
+        { path: "service.py", content: starterBad },
+        { path: "service.py", content: starterFixed },
+      ],
+    }).success,
+    false,
   );
 });

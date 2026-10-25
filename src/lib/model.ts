@@ -52,7 +52,12 @@ export const incidentInput = z.object({
           .max(180)
           .refine(
             (p) =>
-              !p.split("/").includes("..") &&
+              !p
+                .split("/")
+                .some(
+                  (segment) =>
+                    segment === ".." || segment === "." || segment === "",
+                ) &&
               !p.startsWith("/") &&
               p.endsWith(".py"),
             "Use relative Python paths without traversal",
@@ -61,6 +66,10 @@ export const incidentInput = z.object({
       }),
     )
     .max(30)
+    .refine(
+      (files) => new Set(files.map((file) => file.path)).size === files.length,
+      "Source paths must be unique.",
+    )
     .default([]),
 });
 export type IncidentInput = z.infer<typeof incidentInput>;
