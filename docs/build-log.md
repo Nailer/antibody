@@ -86,3 +86,10 @@
 - Corrected commit 84bd63395c1a953dcea51f58b345a0f4b1a54f13 passed pipeline 2986896165 and prevention job 17450507327. Rollout MR !2 merged only after success.
 
 - Verified a second real session (10020978) started through the application itself with read-only agent privileges; observed finished state and actual proposal output through the new API/UI.
+
+## Remaining integration gate handoff — 25 October
+
+- Rechecked canonical main: pipeline 2986935030 passed; live policy remains disabled with Developer-only access.
+- With explicit user permission, sent Maintainer request #2 to the official contributor-success team.
+- Located the existing Antibody Devpost draft (1259399), inspected required fields and confirmed YouTube accepts public or unlisted visibility. No duplicate entry or eligibility attestations were submitted.
+- Updated stale release counts and separated recorded demo completion from pending publication. Added a concrete post-Maintainer verification procedure.

@@ -6,7 +6,7 @@ Updated: 25 October 2026. Google Cloud is deferred. Continue with the local sing
 
 - Local SQLite history, real Semgrep validation, approval gates and exports work.
 - Real GitLab rollout MR creation and existing-MR recovery work.
-- Thirteen backend/scanner tests, two browser tests and the production build passed on the latest increment.
+- 23 backend/scanner tests, three browser tests and the production build passed on the latest increment.
 - Hosted CI now runs successfully in the provisioned public hackathon project.
 - Real Duo session 10020831 completed; the generated detector passed six Semgrep fixture checks.
 
@@ -38,7 +38,7 @@ Done when: one real incident moves through Duo proposal → reviewed draft → r
 
 ### T03 — scan an authorized GitLab repository
 
-Status: implemented; live controlled repository fetch verified. Full integration QA continues.
+Status: implemented; live controlled repository fetch verified. Pinned-source and request-limit checks passed.
 
 - Let the operator select an accessible project and branch/commit.
 - Fetch bounded Python source through the authenticated GitLab API; do not execute repository code.
@@ -50,7 +50,7 @@ Done when: the operator can scan a real repository at a pinned commit without ma
 
 ### T04 — verify prevention in an actual GitLab pipeline
 
-Status: real unsafe-revision failure and corrected-revision success verified in GitLab CI. Rollout MR merged after success. Merge-policy configuration still requires Maintainer access.
+Status: real unsafe-revision failure and corrected-revision success verified in GitLab CI. Rollout MR merged after success. Merge-policy configuration still requires Maintainer access. [Request #2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/work_items/2) has been sent to the official contributor-success team with user authorization.
 
 - Test in a controlled repository with safe bad/fixed fixtures.
 - Run the generated prevention job against both revisions.
@@ -112,7 +112,7 @@ Done when: a fresh local setup can run the core flow without Google Cloud and re
 
 ### T09 — final integrated product QA
 
-Status: local release checks passed (21 backend/scanner tests, three browser workflows, production build and visual review). Live Duo, actual unsafe-code rejection and corrected-code acceptance are verified.
+Status: local release checks passed (23 backend/scanner tests, three browser workflows, production build and visual review). Live Duo, actual unsafe-code rejection and corrected-code acceptance are verified.
 
 - Run core tests and browser checks after the last feature changes.
 - Exercise empty, loading, failed, interrupted, approved and rolled-out states.
@@ -123,7 +123,7 @@ Done when: the release checklist contains evidence for every claimed working int
 
 ### T10 — hackathon submission and reproducibility
 
-Status: official rules reviewed; release checklist, demo script and honest submission draft prepared. Public source confirmation, live Duo/CI proof, video and final submission remain open.
+Status: official rules reviewed; release checklist, demo script and honest submission draft prepared. Public MIT source and live Duo/CI proof are verified; a narrated 2:17 demo is recorded. YouTube publication and final submission remain open.
 
 - Reconcile implemented features with organizer requirements and eligible prize tracks.
 - Check repository visibility, license, required artifacts and submission deadline.

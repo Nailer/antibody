@@ -31,12 +31,14 @@ Additional negative examples challenge overly broad rules. Separate revisions pr
 
 TypeScript, Next.js, React, SQLite, Semgrep, GitLab repository/merge-request/pipeline APIs and a real GitLab Duo custom flow integration. Firestore/Cloud Run preparation is optional and has not been deployed.
 
-## Demonstration and links still required
+## Verified artifacts and final submission gates
 
-- Actual Duo session URL and reviewed generated detector.
-- Actual GitLab pipeline fail/pass URLs.
-- Public GitLab repository with MIT license and reproducible instructions.
-- Public YouTube video under three minutes showing the automation working.
+- Verified Duo session and detector: see the evidence links above and `docs/evidence/`.
+- Verified GitLab fail/pass job URLs: see above.
+- [Public MIT-licensed source and setup instructions](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase).
+- Narrated 2:17 video is recorded; upload to the agreed YouTube channel remains. The entry accepts public or unlisted visibility with no password.
 - Confirmed team and final autonomy category consistent with demonstrated behavior.
 
 Deployment is deferred for the intended Start Fresh path. Final compliance is checked against https://gitlab-transcend.devpost.com/ and its official rules/resources.
+
+The existing entry is [Antibody](https://devpost.com/software/antibody-ahd7om), submission 1259399 for Life After Code. It was inspected on 25 October and remains a draft with 2/5 steps complete. Do not create a duplicate.
