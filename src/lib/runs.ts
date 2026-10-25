@@ -47,6 +47,7 @@ export async function claimRun(id: string) {
     x.findings = [];
     x.events.push({
       at: run.startedAt,
+      runId: run.id,
       message: "Validation started: bad and fixed fixtures.",
     });
   });

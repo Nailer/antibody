@@ -21,7 +21,7 @@ export type RepositorySnapshot = {
   ref: string;
   commit: string;
   fetchedAt: string;
-  scannedFiles: number;
+  fetchedFiles: number;
   complete: boolean;
   skipped: { path: string; reason: string }[];
   treeTruncated: boolean;
@@ -84,7 +84,7 @@ export type Antibody = IncidentInput & {
   run?: { id: string; pid: number; startedAt: string };
   derivedFrom?: string;
   synthesis?: { id: number; url: string; status: string; startedAt: string };
-  events: { at: string; message: string }[];
+  events: { at: string; message: string; runId?: string }[];
 };
 export const starterRule = `rules:
   - id: antibody.python.requests-tls-disabled

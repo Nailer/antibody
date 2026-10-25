@@ -148,6 +148,7 @@ export async function validateAntibody(id: string) {
       x.status = x.checks.every((c) => c.passed) ? "validated" : "failed";
       x.events.push({
         at: new Date().toISOString(),
+        runId: run.id,
         message: `Validation ${x.status === "validated" ? "passed" : "failed"}; scanned ${a.files.length} supplied Python file(s).`,
       });
     });
@@ -161,6 +162,7 @@ export async function validateAntibody(id: string) {
           : "Validation could not complete. Check rule syntax, Python fixtures, and Semgrep installation.";
       x.events.push({
         at: new Date().toISOString(),
+        runId: run.id,
         message: "Validation stopped with an execution error.",
       });
     });
