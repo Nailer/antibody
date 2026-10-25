@@ -28,11 +28,11 @@ test("rejects rewriting rules", () =>
     ),
   ));
 test("Semgrep detects the unsafe fixture and accepts corrected code", async () => {
-  assert.equal(
-    (await runSemgrep(starterRule, [{ path: "bad.py", content: starterBad }]))
-      .length,
-    1,
-  );
+  const bad = await runSemgrep(starterRule, [
+    { path: "bad.py", content: starterBad },
+  ]);
+  assert.equal(bad.length, 1);
+  assert.equal(bad[0].ruleId, "antibody.python.requests-tls-disabled");
   assert.equal(
     (
       await runSemgrep(starterRule, [

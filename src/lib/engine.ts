@@ -30,7 +30,7 @@ export async function runSemgrep(
   rule: string,
   files: { path: string; content: string }[],
 ): Promise<Finding[]> {
-  validateRuleText(rule);
+  const canonicalRuleId = validateRuleText(rule);
   const root = await mkdtemp(join(tmpdir(), "antibody-"));
   try {
     await writeFile(join(root, "rule.yml"), rule, { mode: 0o600 });
@@ -90,7 +90,7 @@ export async function runSemgrep(
         path: f.path.replace(target + "/", ""),
         line: f.start.line,
         message: f.extra.message,
-        ruleId: f.check_id,
+        ruleId: canonicalRuleId,
       }),
     );
   } finally {
