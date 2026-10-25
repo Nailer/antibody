@@ -1,4 +1,6 @@
-stages: [verify]
+stages:
+  - verify
+  - test
 verify:
   image: node:24-bookworm
   stage: verify
@@ -12,3 +14,5 @@ verify:
     - npm run build
   variables:
     NEXT_TELEMETRY_DISABLED: "1"
+include:
+  - local: .antibody/8a30e277-dac5-4e49-b57b-75c2d8b8913d-ci.yml

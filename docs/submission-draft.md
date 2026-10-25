@@ -1,6 +1,6 @@
 # Antibody submission draft — not ready to submit
 
-The mandatory live Duo and GitLab CI evidence is still missing. Replace this status only after the real integration gates pass; do not describe the prepared adapter as a completed agent run.
+The real Duo proposal and unsafe-revision CI rejection are verified. Corrected-revision CI also passed. Public video and final submission review remain.
 
 ## Tagline
 
@@ -16,11 +16,12 @@ Antibody records the confirmed failure and fix, accepts a reviewed Semgrep detec
 
 ## GitLab integration — current evidence
 
-- Authenticated project/revision selection and repository source retrieval work.
-- Controlled real repository scanning found the expected unsafe example at commit `b47ae455277b3bad4f06b51ee4410b4265164ea0`.
-- Real rollout creation is demonstrated by [MR !1](https://gitlab.com/antibody-group1/Antibody-project/-/merge_requests/1).
-- Live MR, pipeline and merge-policy inspection work. The existing pipeline is failed because the GitLab account is unverified; no successful hosted execution is claimed.
-- The custom Duo flow definition and API adapter exist, with structured session storage and a reviewed draft-import flow. Catalog creation is permission-blocked; no live generated proposal is claimed.
+- [Real completed custom Duo session](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/automate/agent-sessions/10020831) generated a bounded detector, fixtures and detection limits.
+- The reviewed output passed six actual Semgrep fixture checks and found one controlled source match.
+- [Rollout MR !2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/merge_requests/2) proposes the generated rule and CI job.
+- [Real prevention job](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/jobs/17450487967) rejected the unsafe fixture with one finding and exit code 1.
+- Hosted application verification and the [corrected-revision prevention job](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/jobs/17450507327) passed.
+- The application reports pipeline state and the absence of a merge-blocking policy separately.
 
 ## What makes the evidence useful
 
@@ -28,7 +29,7 @@ Additional negative examples challenge overly broad rules. Separate revisions pr
 
 ## Built with
 
-TypeScript, Next.js, React, SQLite, Semgrep, GitLab repository/merge-request/pipeline APIs and a prepared GitLab Duo custom flow integration. Firestore/Cloud Run preparation is optional and has not been deployed.
+TypeScript, Next.js, React, SQLite, Semgrep, GitLab repository/merge-request/pipeline APIs and a real GitLab Duo custom flow integration. Firestore/Cloud Run preparation is optional and has not been deployed.
 
 ## Demonstration and links still required
 

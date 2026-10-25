@@ -1,0 +1,19 @@
+rules:
+  - id: antibody.python.requests-verify-false
+    languages: [python]
+    severity: ERROR
+    message: >-
+      A Requests call passes verify=False, which disables TLS certificate
+      verification and allows machine-in-the-middle attacks. Use the default
+      verification (verify=True or omit the argument). For a private CA, pass
+      verify="/path/to/ca-bundle.pem".
+    metadata:
+      category: security
+      cwe: "CWE-295: Improper Certificate Validation"
+      confidence: MEDIUM
+      status: proposed-unvalidated
+    patterns:
+      - pattern: requests.$FUNC(..., verify=False, ...)
+      - metavariable-regex:
+          metavariable: $FUNC
+          regex: ^(get|post|put|patch|delete|head|options|request)$

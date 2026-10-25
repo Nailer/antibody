@@ -1490,3 +1490,34 @@ select:focus-visible {
   outline: 2px solid #24734d;
   outline-offset: 2px;
 }
+
+.proposal-dialog {
+  width: min(960px, calc(100vw - 32px));
+  max-height: 88dvh;
+  overflow: auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper, #fafbf7);
+}
+.proposal-dialog::backdrop {
+  background: #17251ecc;
+}
+.proposal-dialog h2 {
+  margin-bottom: 12px;
+}
+.proposal-dialog pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 60dvh;
+  overflow: auto;
+  padding: 20px;
+  line-height: 1.6;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}

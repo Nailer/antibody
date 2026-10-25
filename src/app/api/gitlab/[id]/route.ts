@@ -1,6 +1,6 @@
 import { readJson } from "@/lib/http";
 import { getAntibody, updateAntibody } from "@/lib/store";
-import { createRollout, synthesize, gitlab } from "@/lib/gitlab";
+import { createRollout, synthesize, gitlab, getDuoSession } from "@/lib/gitlab";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 export async function POST(
@@ -51,13 +51,33 @@ export async function POST(
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const a = await getAntibody(id);
   if (!a)
     return Response.json({ error: "Antibody not found" }, { status: 404 });
+  if (new URL(req.url).searchParams.get("action") === "synthesis") {
+    if (!a.synthesis)
+      return Response.json(
+        { error: "Start a Duo session first." },
+        { status: 409 },
+      );
+    try {
+      const result = await getDuoSession(a.synthesis.id);
+      await updateAntibody(id, (x) => {
+        if (x.synthesis?.id === a.synthesis!.id)
+          x.synthesis = { ...x.synthesis, ...result };
+      });
+      return Response.json(result);
+    } catch (error) {
+      return Response.json(
+        { error: (error as Error).message },
+        { status: 502 },
+      );
+    }
+  }
   const url = a.events
     .find((e) => e.message.startsWith("GitLab rollout MR created: "))
     ?.message.slice("GitLab rollout MR created: ".length);
@@ -73,12 +93,26 @@ export async function GET(
       : process.env.GITLAB_PROJECT_ID;
     if (!project) throw Error("GitLab project is not configured.");
     const p = encodeURIComponent(project);
-    const [mr, info] = await Promise.all([
+    const [mr, info, pipelines] = await Promise.all([
       gitlab(`/projects/${p}/merge_requests/${iid}`),
       gitlab(`/projects/${p}`),
+      gitlab(`/projects/${p}/merge_requests/${iid}/pipelines?per_page=5`),
     ]);
     return Response.json({
       state: mr.state,
+      history: pipelines.map(
+        (pipeline: {
+          id: number;
+          status: string;
+          sha: string;
+          web_url: string;
+        }) => ({
+          id: pipeline.id,
+          status: pipeline.status,
+          sha: pipeline.sha,
+          url: pipeline.web_url,
+        }),
+      ),
       pipeline: mr.head_pipeline
         ? { status: mr.head_pipeline.status, url: mr.head_pipeline.web_url }
         : null,

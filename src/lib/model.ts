@@ -92,7 +92,14 @@ export type Antibody = IncidentInput & {
   repository?: RepositorySnapshot;
   run?: { id: string; pid: number; startedAt: string };
   derivedFrom?: string;
-  synthesis?: { id: number; url: string; status: string; startedAt: string };
+  synthesis?: {
+    id: number;
+    url: string;
+    status: string;
+    startedAt: string;
+    output?: string;
+    checkedAt?: string;
+  };
   events: { at: string; message: string; runId?: string }[];
 };
 export const starterRule = `rules:
