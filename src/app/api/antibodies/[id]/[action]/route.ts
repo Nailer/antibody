@@ -44,7 +44,7 @@ export async function POST(
         events: [
           {
             at: now,
-            message: `New draft derived from ${a.id}${a.synthesis ? `; reviewed proposal from Duo session ${a.synthesis.id}` : ""}. Validation is required.`,
+            message: `New draft derived from ${a.id}${a.synthesis ? `; original incident has Duo session ${a.synthesis.id}; this revision is operator-supplied` : ""}. Validation is required.`,
           },
         ],
       });
