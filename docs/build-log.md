@@ -65,3 +65,7 @@
 - Added separate draft revisions for reviewed proposal imports; originals retain their evidence and approval.
 - Detail URLs now survive refresh and browser history. Unfinished form text is retained in the current tab with an explicit retention notice.
 - Duo session ID, URL and initial status are stored structurally; unavailable live progress is not fabricated.
+
+- Added recovery of matching orphaned rollout branches and live MR/pipeline/merge-policy inspection. The real existing MR is open, its pipeline is failed, and merge blocking is not configured; the UI reports these separately.
+- Verified owner-only SQLite backup and restore with seven actual local records, without overwriting the source.
+- Prepared a release checklist, honest submission draft and demo script; final publishing remains gated on real Duo/CI evidence.

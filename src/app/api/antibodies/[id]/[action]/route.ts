@@ -1,3 +1,4 @@
+import { snapshotRepository } from "@/lib/repository";
 import { RequestError, readJson } from "@/lib/http";
 import { incidentInput } from "@/lib/model";
 import { randomUUID } from "node:crypto";
@@ -20,10 +21,19 @@ export async function POST(
     if (action === "revise") {
       const input = incidentInput.parse(await readJson(req));
       validateRuleText(input.rule);
+      const { repositorySource, ...draft } = input;
+      const snapshot = repositorySource
+        ? await snapshotRepository(
+            repositorySource.projectId,
+            repositorySource.ref,
+          )
+        : a.repository
+          ? { files: a.files, repository: a.repository }
+          : { files: input.files };
       const now = new Date().toISOString();
       const revised = await saveAntibody({
-        ...input,
-        files: a.repository ? a.files : input.files,
+        ...draft,
+        ...snapshot,
         id: randomUUID(),
         createdAt: now,
         updatedAt: now,
@@ -31,7 +41,6 @@ export async function POST(
         checks: [],
         findings: [],
         derivedFrom: a.id,
-        repository: a.repository,
         events: [
           {
             at: now,

@@ -101,3 +101,34 @@ test("mobile navigation, form, and landing have no horizontal overflow", async (
   ).toBeTruthy();
   await page.screenshot({ path: "/tmp/antibody-mobile.png", fullPage: true });
 });
+test("a failed detector keeps approval locked and supports a corrected revision", async ({
+  page,
+}) => {
+  await page.goto("/app?view=create");
+  await page.getByRole("button", { name: "Use TLS example" }).click();
+  await page
+    .getByLabel("Incident title")
+    .fill("Controlled invalid detector recovery");
+  await page.getByLabel("Semgrep rule YAML").fill("rules: []");
+  await page.getByRole("button", { name: "Create draft antibody" }).click();
+  await page.getByRole("button", { name: "Run validation" }).click();
+  await expect(
+    page.getByText(
+      "Validation could not complete. Check rule syntax, Python fixtures, and Semgrep installation.",
+    ),
+  ).toBeVisible({ timeout: 60000 });
+  await expect(
+    page.getByRole("button", { name: "Approve prevention pack" }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Revise / import reviewed proposal" })
+    .click();
+  await page.getByRole("button", { name: "Use TLS example" }).click();
+  await page.getByRole("button", { name: "Save new draft version" }).click();
+  await expect(
+    page.getByRole("button", { name: "Run validation" }),
+  ).toBeEnabled();
+  await expect(
+    page.getByRole("button", { name: "original evidence" }),
+  ).toBeVisible();
+});
