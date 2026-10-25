@@ -1246,7 +1246,11 @@ code {
     transition: transform 0.2s;
     box-shadow: 10px 0 40px #23341f20;
   }
+  .sidebar:not(.open) {
+    visibility: hidden;
+  }
   .sidebar.open {
+    visibility: visible;
     transform: translateX(0);
   }
   .mobile-menu,

@@ -26,6 +26,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { type Antibody } from "@/lib/model";
+import RolloutStatus from "./rollout-status";
 import Create from "./create-antibody";
 import { PageHeading, Integration, ScanIcon } from "./workspace-ui";
 type View = "overview" | "antibodies" | "integrations" | "create" | "detail";
@@ -74,6 +75,7 @@ export default function Workspace() {
   const [view, setView] = useState<View>("overview"),
     [items, setItems] = useState<Antibody[]>([]),
     [selected, setSelected] = useState<string>(),
+    [revision, setRevision] = useState<string>(),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -92,7 +94,23 @@ export default function Workspace() {
     }
   }, []);
   useEffect(() => {
+    function restore() {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get("view");
+      setView(
+        ["overview", "antibodies", "integrations", "create", "detail"].includes(
+          v || "",
+        )
+          ? (v as View)
+          : "overview",
+      );
+      setSelected(params.get("id") || undefined);
+      setRevision(params.get("from") || undefined);
+    }
+    restore();
+    window.addEventListener("popstate", restore);
     void refresh();
+    return () => window.removeEventListener("popstate", restore);
   }, [refresh]);
   const active = items.find((a) => a.id === selected);
   const rolloutUrl = active?.events
@@ -105,7 +123,17 @@ export default function Workspace() {
     const timer = setInterval(() => void refresh(), 2500);
     return () => clearInterval(timer);
   }, [items, refresh]);
-  function navigate(next: View) {
+  function navigate(next: View, id?: string) {
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("view", next);
+    if (next === "detail" && id) {
+      setSelected(id);
+      url.searchParams.set("id", id);
+    }
+    setRevision(next === "create" ? id : undefined);
+    if (next === "create" && id) url.searchParams.set("from", id);
+    window.history.pushState({}, "", url);
     setView(next);
     setMobile(false);
     setError("");
@@ -133,7 +161,20 @@ export default function Workspace() {
   };
   return (
     <div className="workspace">
-      <aside className={mobile ? "sidebar open" : "sidebar"}>
+      <aside
+        id="workspace-navigation"
+        className={mobile ? "sidebar open" : "sidebar"}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setMobile(false);
+            document
+              .querySelector<HTMLButtonElement>(
+                'button[aria-label="Open navigation"]',
+              )
+              ?.focus();
+          }
+        }}
+      >
         <Link href="/" className="brand">
           <ShieldCheck size={23} />
           antibody
@@ -207,6 +248,8 @@ export default function Workspace() {
           <button
             className="icon-button mobile-menu"
             aria-label="Open navigation"
+            aria-expanded={mobile}
+            aria-controls="workspace-navigation"
             onClick={() => setMobile(true)}
           >
             <Menu />
@@ -247,12 +290,18 @@ export default function Workspace() {
             </div>
           ) : view === "create" ? (
             <Create
+              key={revision || "new"}
+              initial={items.find((a) => a.id === revision)}
               onCancel={() => navigate("antibodies")}
               onCreate={async (input) => {
-                const a = await request("/api/antibodies", input);
+                const a = await request(
+                  revision
+                    ? `/api/antibodies/${revision}/revise`
+                    : "/api/antibodies",
+                  input,
+                );
                 await refresh();
-                setSelected(a.id);
-                navigate("detail");
+                navigate("detail", a.id);
               }}
             />
           ) : view === "integrations" ? (
@@ -336,6 +385,26 @@ export default function Workspace() {
                 </div>
                 <Status value={active.status} />
               </div>
+              <div style={{ marginBottom: 24 }}>
+                <button
+                  className="button secondary"
+                  onClick={() => navigate("create", active.id)}
+                >
+                  Revise / import reviewed proposal
+                </button>
+                {active.derivedFrom && (
+                  <p className="muted">
+                    New draft derived from{" "}
+                    <button
+                      className="text-button"
+                      onClick={() => navigate("detail", active.derivedFrom)}
+                    >
+                      original evidence
+                    </button>
+                    . Validation and approval do not carry over.
+                  </p>
+                )}
+              </div>
               <div className="detail-layout">
                 <div>
                   <section className="panel">
@@ -372,8 +441,8 @@ export default function Workspace() {
                     <div className="panel-footer">
                       <p>
                         {active.status === "running"
-                          ? "Scanning real fixtures. This can take up to two minutes."
-                          : "Two fixture checks establish a starting point, not a general accuracy guarantee."}
+                          ? "Scanning real fixtures and source. Each stage has a timeout."
+                          : "Fixture checks establish a starting point, not a general accuracy guarantee."}
                       </p>
                       <button
                         className="button small"
@@ -527,14 +596,17 @@ export default function Workspace() {
                           exported CI job.
                         </p>
                         {rolloutUrl ? (
-                          <a
-                            className="button secondary full"
-                            href={rolloutUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View rollout MR <ArrowUpRight size={15} />
-                          </a>
+                          <div>
+                            <a
+                              className="button secondary full"
+                              href={rolloutUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              View rollout MR <ArrowUpRight size={15} />
+                            </a>
+                            <RolloutStatus id={active.id} />
+                          </div>
                         ) : (
                           <button
                             className="button secondary full"
@@ -594,33 +666,57 @@ export default function Workspace() {
                       ))}
                     </ol>
                   </section>
-                  {settings?.duo && (
+                  {(settings?.duo || active.synthesis) && (
                     <section className="panel">
                       <h2>Duo synthesis</h2>
                       <p className="muted">
                         Start a real GitLab session with this incident. Review
                         its proposed rule before creating a new version.
                       </p>
-                      <button
-                        className="button secondary full"
-                        disabled={busy}
-                        onClick={async () => {
-                          setBusy(true);
-                          try {
-                            const r = await request(
-                              `/api/gitlab/${active.id}`,
-                              { action: "synthesize" },
-                            );
-                            setNotice(`Duo session started: ${r.url}`);
-                          } catch (e) {
-                            setError((e as Error).message);
-                          } finally {
-                            setBusy(false);
-                          }
-                        }}
-                      >
-                        Start Duo session <ExternalLink size={14} />
-                      </button>
+                      {active.synthesis ? (
+                        <div>
+                          <p>
+                            Session #{active.synthesis.id} ·{" "}
+                            {active.synthesis.status} when started
+                          </p>
+                          <a
+                            className="button secondary full"
+                            href={active.synthesis.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View Duo session <ExternalLink size={14} />
+                          </a>
+                          <p className="muted">
+                            Review the result in GitLab, then use “Revise /
+                            import reviewed proposal” to create a separate
+                            draft. Status is the last response received, not
+                            live progress.
+                          </p>
+                        </div>
+                      ) : (
+                        <button
+                          className="button secondary full"
+                          disabled={busy}
+                          onClick={async () => {
+                            setBusy(true);
+                            try {
+                              const r = await request(
+                                `/api/gitlab/${active.id}`,
+                                { action: "synthesize" },
+                              );
+                              await refresh();
+                              setNotice(`Duo session started: ${r.url}`);
+                            } catch (e) {
+                              setError((e as Error).message);
+                            } finally {
+                              setBusy(false);
+                            }
+                          }}
+                        >
+                          Start Duo session <ExternalLink size={14} />
+                        </button>
+                      )}
                     </section>
                   )}
                 </div>
@@ -701,8 +797,7 @@ export default function Workspace() {
                         className="registry-row"
                         key={a.id}
                         onClick={() => {
-                          setSelected(a.id);
-                          navigate("detail");
+                          navigate("detail", a.id);
                         }}
                       >
                         <span className="row-identity">

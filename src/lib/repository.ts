@@ -114,7 +114,7 @@ export async function snapshotRepository(projectId: string, ref: string) {
     ref,
     commit: commit.id,
     fetchedAt: new Date().toISOString(),
-    scannedFiles: files.length,
+    fetchedFiles: files.length,
     complete: !treeTruncated && !skipped.length,
     skipped,
     treeTruncated,

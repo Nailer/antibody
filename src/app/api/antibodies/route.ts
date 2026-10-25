@@ -3,9 +3,13 @@ import { readJson, RequestError } from "@/lib/http";
 import { randomUUID } from "node:crypto";
 import { incidentInput } from "@/lib/model";
 import { listAntibodies, saveAntibody } from "@/lib/store";
+import { recoverRun } from "@/lib/runs";
 export const runtime = "nodejs";
+export const maxDuration = 180;
 export async function GET() {
-  return Response.json(await listAntibodies());
+  return Response.json(
+    await Promise.all((await listAntibodies()).map(recoverRun)),
+  );
 }
 export async function POST(req: Request) {
   try {

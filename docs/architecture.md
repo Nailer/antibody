@@ -12,7 +12,7 @@ Draft → Running → Validated or Failed → Approved. A failed scan can be ret
 
 ## Evidence limits
 
-Two fixture checks are a minimal validation, not an accuracy estimate. Upload scanning reports matches rather than confirmed vulnerabilities. No unlabelled organization-wide corpus is used to assert a false-positive rate. The starter detector is deterministic, maintained and explicitly labelled; it is not AI-generated. Real Duo synthesis requires a configured flow and returns a reviewable GitLab session. Operator review and importing the resulting YAML into a new draft are currently manual.
+Two fixture checks are a minimal validation, not an accuracy estimate. Upload scanning reports matches rather than confirmed vulnerabilities. No unlabelled organization-wide corpus is used to assert a false-positive rate. The starter detector is deterministic, maintained and explicitly labelled; it is not AI-generated. Real Duo synthesis requires a configured flow and returns a reviewable GitLab session. Operator review remains explicit. The revision/import form preserves the original record and requires new validation and approval.
 
 ## GitLab rollout
 
@@ -24,7 +24,7 @@ Local development binds to loopback. For a network deployment, ACCESS_TOKEN enab
 
 ## Persistence and execution
 
-SQLite uses WAL with a busy timeout. Persist .data on a local disk. Validations run in the request process; this version does not have a durable job queue or multi-instance execution coordination. A process crash can leave a record Running and requires operator recovery. Production multi-tenant operation needs a durable database, job queue, tenant isolation, audit principals and repository-scoped credentials.
+SQLite uses WAL with a busy timeout. Persist .data on a local disk. Validations run in the request process; this version does not have a durable job queue or multi-instance execution coordination. Runs are claimed transactionally. Local abandoned runs are detected by owner-process liveness or a ten-minute lease limit and become retryable failures. Run identifiers prevent late work from replacing newer evidence. Firestore uses lease expiry rather than host-local PID checks. Production multi-tenant operation needs a durable database, job queue, tenant isolation, audit principals and repository-scoped credentials.
 
 ## Cloud Run
 
@@ -33,3 +33,9 @@ A Firestore storage adapter is now available through `ANTIBODY_STORE=firestore`,
 The container can run on Cloud Run, but the bundled SQLite file is ephemeral there. Cloud Run deployment with durable history must use the Firestore adapter and be verified after deployment. Do not mount SQLite WAL onto an object-store filesystem. Local Docker with a persistent volume is the supported durable deployment in this version. No cloud resources are created by setup.
 
 GitLab OAuth credentials are suitable for validating this integration. An unattended deployment requires a managed credential rotation strategy; copying a desktop OAuth access token does not provide automatic refresh in Cloud Run.
+
+## Repository source and revisions
+
+Repository source is retrieved through GitLab APIs at an immutable commit SHA, with a 30-file, 100 KB/file, 400 KB/source and 1,000-tree-entry ceiling. Partial coverage is explicit. Source links reference that same commit. No repository code is executed. A reviewed revision always starts as a new draft; validation and approval do not transfer. For repository-backed revisions, the original pinned source is retained.
+
+The scanner subprocess receives only runtime/path/certificate settings, not GitLab or application access tokens. Source and fixtures are stored locally in the operator database; unsaved text is temporarily stored in the browser tab's session storage. Closing the tab removes that unsaved text. Approved evidence exports contain findings and provenance rather than the whole uploaded source corpus.

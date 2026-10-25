@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { parse } from "yaml";
-import { getAntibody, updateAntibody } from "./store";
+import { claimRun, updateRun } from "./runs";
 import type { Finding } from "./model";
 const execute = promisify(execFile);
 export function validateRuleText(rule: string) {
@@ -30,7 +30,7 @@ export async function runSemgrep(
   rule: string,
   files: { path: string; content: string }[],
 ): Promise<Finding[]> {
-  validateRuleText(rule);
+  const canonicalRuleId = validateRuleText(rule);
   const root = await mkdtemp(join(tmpdir(), "antibody-"));
   try {
     await writeFile(join(root, "rule.yml"), rule, { mode: 0o600 });
@@ -63,7 +63,16 @@ export async function runSemgrep(
       {
         timeout: 60000,
         maxBuffer: 4 * 1024 * 1024,
-        env: { ...process.env, SEMGREP_SEND_METRICS: "off" },
+        env: {
+          NODE_ENV: process.env.NODE_ENV,
+          PATH: process.env.PATH,
+          HOME: process.env.HOME,
+          TMPDIR: process.env.TMPDIR,
+          LANG: process.env.LANG,
+          SSL_CERT_FILE: process.env.SSL_CERT_FILE,
+          REQUESTS_CA_BUNDLE: process.env.REQUESTS_CA_BUNDLE,
+          SEMGREP_SEND_METRICS: "off",
+        },
       },
     );
     const data = JSON.parse(stdout);
@@ -81,7 +90,7 @@ export async function runSemgrep(
         path: f.path.replace(target + "/", ""),
         line: f.start.line,
         message: f.extra.message,
-        ruleId: f.check_id,
+        ruleId: canonicalRuleId,
       }),
     );
   } finally {
@@ -89,27 +98,14 @@ export async function runSemgrep(
   }
 }
 export async function validateAntibody(id: string) {
-  const a = await getAntibody(id);
-  if (!a) throw new Error("Antibody not found");
-  if (a.status === "approved")
-    throw new Error(
-      "Approved packs are immutable. Create a new antibody to revise a rule.",
-    );
-  await updateAntibody(id, (x) => {
-    x.status = "running";
-    x.error = undefined;
-    x.checks = [];
-    x.findings = [];
-    x.events.push({
-      at: new Date().toISOString(),
-      message: "Validation started: bad and fixed fixtures.",
-    });
-  });
+  const { a, run } = await claimRun(id);
+  const change = (fn: Parameters<typeof updateRun>[2]) =>
+    updateRun(id, run.id, fn);
   try {
     const bad = await runSemgrep(a.rule, [
       { path: "bad.py", content: a.badCode },
     ]);
-    await updateAntibody(id, (x) => {
+    await change((x) => {
       x.checks.push({
         name: "Known failure detected",
         passed: bad.length > 0,
@@ -119,24 +115,46 @@ export async function validateAntibody(id: string) {
     const fixed = await runSemgrep(a.rule, [
       { path: "fixed.py", content: a.fixedCode },
     ]);
-    await updateAntibody(id, (x) => {
+    await change((x) => {
       x.checks.push({
         name: "Known fix accepted",
         passed: fixed.length === 0,
         detail: `${fixed.length} finding(s) in the corrected fixture.`,
       });
     });
+    if (a.extraFixtures?.length) {
+      const extra = await runSemgrep(
+        a.rule,
+        a.extraFixtures.map((fixture, i) => ({
+          path: `extra_${i}.py`,
+          content: fixture.code,
+        })),
+      );
+      await change((x) => {
+        a.extraFixtures!.forEach((fixture, i) => {
+          const matched = extra.some((f) => f.path === `extra_${i}.py`);
+          x.checks.push({
+            name: `Example ${i + 1}: ${fixture.name}`,
+            passed: matched === fixture.expectMatch,
+            detail: `Expected ${fixture.expectMatch ? "a match" : "no match"}; observed ${matched ? "a match" : "no match"}.`,
+          });
+        });
+      });
+    }
     const findings = a.files.length ? await runSemgrep(a.rule, a.files) : [];
-    return updateAntibody(id, (x) => {
+    return change((x) => {
+      delete x.run;
       x.findings = findings;
       x.status = x.checks.every((c) => c.passed) ? "validated" : "failed";
       x.events.push({
         at: new Date().toISOString(),
+        runId: run.id,
         message: `Validation ${x.status === "validated" ? "passed" : "failed"}; scanned ${a.files.length} supplied Python file(s).`,
       });
     });
   } catch (error) {
-    return updateAntibody(id, (x) => {
+    return change((x) => {
+      delete x.run;
       x.status = "failed";
       x.error =
         error instanceof Error && /ENOENT/.test(error.message)
@@ -144,6 +162,7 @@ export async function validateAntibody(id: string) {
           : "Validation could not complete. Check rule syntax, Python fixtures, and Semgrep installation.";
       x.events.push({
         at: new Date().toISOString(),
+        runId: run.id,
         message: "Validation stopped with an execution error.",
       });
     });

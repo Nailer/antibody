@@ -57,3 +57,18 @@
 - Repository evidence includes file limits, skipped files, coverage and source links; arbitrary clone URLs and execution are not accepted.
 - Live GitLab fetch successfully retrieved two labelled controlled fixtures from `antibody/controlled-scan-fixtures`, commit `b47ae455277b3bad4f06b51ee4410b4265164ea0`.
 - Sixteen tests passed, including pinned-source, skipped-source and streamed request-size checks.
+
+## Evidence lifecycle and recovery
+
+- Added transactional run claiming, stale-writer rejection and recovery of interrupted local validations.
+- Added up to eight named positive/negative examples; approval depends on all observed fixture outcomes.
+- Added separate draft revisions for reviewed proposal imports; originals retain their evidence and approval.
+- Detail URLs now survive refresh and browser history. Unfinished form text is retained in the current tab with an explicit retention notice.
+- Duo session ID, URL and initial status are stored structurally; unavailable live progress is not fabricated.
+
+- Added recovery of matching orphaned rollout branches and live MR/pipeline/merge-policy inspection. The real existing MR is open, its pipeline is failed, and merge blocking is not configured; the UI reports these separately.
+- Verified owner-only SQLite backup and restore with seven actual local records, without overwriting the source.
+- Prepared a release checklist, honest submission draft and demo script; final publishing remains gated on real Duo/CI evidence.
+
+- Final local verification: 21 backend/scanner tests passed; three browser workflows passed including invalid-detector recovery. Production build, TypeScript and formatting passed.
+- Reviewed repository evidence/source links at desktop and mobile widths; fixed off-screen mobile-navigation visibility and added Escape/expanded-state semantics.

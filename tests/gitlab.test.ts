@@ -32,6 +32,8 @@ test("rollout preserves existing CI and adds its required stage", async () => {
   let commit: { actions: { file_path: string; content: string }[] } | undefined;
   global.fetch = (async (url, options) => {
     const path = String(url);
+    if (path.includes("repository/branches/"))
+      return Response.json({ message: "missing" }, { status: 404 });
     if (path.includes("merge_requests?")) return Response.json([]);
     if (path.includes("repository/files/"))
       return Response.json({
@@ -104,6 +106,64 @@ test("retrying rollout reuses its open MR without writing another commit", async
     assert.deepEqual(methods, ["GET", "GET"]);
   } finally {
     global.fetch = priorFetch;
+    if (priorToken === undefined) delete process.env.GITLAB_TOKEN;
+    else process.env.GITLAB_TOKEN = priorToken;
+    if (priorProject === undefined) delete process.env.GITLAB_PROJECT_ID;
+    else process.env.GITLAB_PROJECT_ID = priorProject;
+  }
+});
+test("rollout recovers an orphan branch only when rule, job and include match", async () => {
+  const { createRollout, preventionJob } = await import("../src/lib/gitlab");
+  const original = global.fetch,
+    priorToken = process.env.GITLAB_TOKEN,
+    priorProject = process.env.GITLAB_PROJECT_ID;
+  process.env.GITLAB_TOKEN = "test";
+  process.env.GITLAB_PROJECT_ID = "test/project";
+  const id = "orphan";
+  let commits = 0,
+    mrs = 0;
+  global.fetch = (async (url, options) => {
+    const path = String(url);
+    if (path.includes("merge_requests?")) return Response.json([]);
+    if (path.includes("/repository/branches/"))
+      return Response.json({ name: `antibody/${id}` });
+    if (path.includes("/repository/files/")) {
+      const filePath = decodeURIComponent(
+        path.split("/repository/files/")[1].split("?")[0],
+      );
+      const content =
+        filePath === ".gitlab-ci.yml"
+          ? `include:\n  - local: .antibody/${id}-ci.yml\n`
+          : filePath.endsWith("-ci.yml")
+            ? preventionJob(id)
+            : "rules: []";
+      return Response.json({
+        content: Buffer.from(content).toString("base64"),
+      });
+    }
+    if (path.endsWith("/repository/commits")) commits++;
+    if (path.endsWith("/merge_requests") && options?.method === "POST") {
+      mrs++;
+      return Response.json({
+        web_url: "https://gitlab.com/test/project/-/merge_requests/5",
+      });
+    }
+    return Response.json({ default_branch: "main" });
+  }) as typeof fetch;
+  try {
+    await createRollout({
+      id,
+      status: "approved",
+      rule: "rules: []",
+      title: "controlled",
+      incident: "controlled",
+      files: [],
+      findings: [],
+    } as unknown as import("../src/lib/model").Antibody);
+    assert.equal(commits, 0);
+    assert.equal(mrs, 1);
+  } finally {
+    global.fetch = original;
     if (priorToken === undefined) delete process.env.GITLAB_TOKEN;
     else process.env.GITLAB_TOKEN = priorToken;
     if (priorProject === undefined) delete process.env.GITLAB_PROJECT_ID;

@@ -5,7 +5,14 @@ export const repositorySelection = z.object({
     .min(1)
     .max(200)
     .regex(/^[a-zA-Z0-9_./-]+$/),
-  ref: z.string().min(1).max(200),
+  ref: z
+    .string()
+    .min(1)
+    .max(200)
+    .refine(
+      (value) => value !== "." && value !== "..",
+      "Choose a branch, tag or commit.",
+    ),
 });
 export type RepositorySnapshot = {
   projectId: number;
@@ -14,7 +21,7 @@ export type RepositorySnapshot = {
   ref: string;
   commit: string;
   fetchedAt: string;
-  scannedFiles: number;
+  fetchedFiles: number;
   complete: boolean;
   skipped: { path: string; reason: string }[];
   treeTruncated: boolean;
@@ -26,6 +33,16 @@ export const incidentInput = z.object({
   fixedCode: z.string().min(5).max(50000),
   rule: z.string().min(10).max(30000),
   repositorySource: repositorySelection.optional(),
+  extraFixtures: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(80),
+        code: z.string().min(5).max(20000),
+        expectMatch: z.boolean(),
+      }),
+    )
+    .max(8)
+    .optional(),
   files: z
     .array(
       z.object({
@@ -35,7 +52,12 @@ export const incidentInput = z.object({
           .max(180)
           .refine(
             (p) =>
-              !p.split("/").includes("..") &&
+              !p
+                .split("/")
+                .some(
+                  (segment) =>
+                    segment === ".." || segment === "." || segment === "",
+                ) &&
               !p.startsWith("/") &&
               p.endsWith(".py"),
             "Use relative Python paths without traversal",
@@ -44,6 +66,10 @@ export const incidentInput = z.object({
       }),
     )
     .max(30)
+    .refine(
+      (files) => new Set(files.map((file) => file.path)).size === files.length,
+      "Source paths must be unique.",
+    )
     .default([]),
 });
 export type IncidentInput = z.infer<typeof incidentInput>;
@@ -64,7 +90,10 @@ export type Antibody = IncidentInput & {
   error?: string;
   approvedAt?: string;
   repository?: RepositorySnapshot;
-  events: { at: string; message: string }[];
+  run?: { id: string; pid: number; startedAt: string };
+  derivedFrom?: string;
+  synthesis?: { id: number; url: string; status: string; startedAt: string };
+  events: { at: string; message: string; runId?: string }[];
 };
 export const starterRule = `rules:
   - id: antibody.python.requests-tls-disabled

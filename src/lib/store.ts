@@ -93,8 +93,23 @@ export async function updateAntibody(
       return a;
     });
   }
-  const a = await getAntibody(id);
-  if (!a) throw new Error("Antibody not found");
-  fn(a);
-  return saveAntibody(a);
+  const sql = database();
+  sql.exec("BEGIN IMMEDIATE");
+  try {
+    const row = sql
+      .prepare("SELECT body FROM antibodies WHERE id=?")
+      .get(id) as { body: string } | undefined;
+    if (!row) throw new Error("Antibody not found");
+    const a: Antibody = JSON.parse(row.body);
+    fn(a);
+    a.updatedAt = new Date().toISOString();
+    sql
+      .prepare("UPDATE antibodies SET body=? WHERE id=?")
+      .run(JSON.stringify(a), id);
+    sql.exec("COMMIT");
+    return a;
+  } catch (error) {
+    sql.exec("ROLLBACK");
+    throw error;
+  }
 }
