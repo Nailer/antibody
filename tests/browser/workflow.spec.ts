@@ -99,7 +99,23 @@ test("mobile navigation, form, and landing have no horizontal overflow", async (
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBeTruthy();
-  await page.screenshot({ path: "/tmp/antibody-mobile.png", fullPage: true });
+  await page.screenshot({
+    path: "/tmp/antibody-mobile.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.goto("/app?view=create");
+  await page
+    .getByLabel("Source for exposure scanning")
+    .selectOption("repository");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await expect(
+    page.getByRole("button", { name: "Close navigation" }),
+  ).toBeHidden();
 });
 test("a failed detector keeps approval locked and supports a corrected revision", async ({
   page,
@@ -109,7 +125,9 @@ test("a failed detector keeps approval locked and supports a corrected revision"
   await page
     .getByLabel("Incident title")
     .fill("Controlled invalid detector recovery");
-  await page.getByLabel("Semgrep rule YAML").fill("rules: []");
+  await page
+    .getByLabel("Semgrep rule YAML")
+    .fill("rules: []\n# Controlled invalid detector");
   await page.getByRole("button", { name: "Create draft antibody" }).click();
   await page.getByRole("button", { name: "Run validation" }).click();
   await expect(

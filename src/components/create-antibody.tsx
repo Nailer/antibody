@@ -291,8 +291,8 @@ export default function Create({
             <div className="boundary-note">
               <Clock size={17} />
               <span>
-                Validation can take up to two minutes. You can return to the
-                workspace while it runs.
+                Several scans run in sequence. Keep the local application
+                running until validation completes.
               </span>
             </div>
             {error && (

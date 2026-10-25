@@ -5,7 +5,14 @@ export const repositorySelection = z.object({
     .min(1)
     .max(200)
     .regex(/^[a-zA-Z0-9_./-]+$/),
-  ref: z.string().min(1).max(200),
+  ref: z
+    .string()
+    .min(1)
+    .max(200)
+    .refine(
+      (value) => value !== "." && value !== "..",
+      "Choose a branch, tag or commit.",
+    ),
 });
 export type RepositorySnapshot = {
   projectId: number;

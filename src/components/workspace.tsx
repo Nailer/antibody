@@ -161,7 +161,20 @@ export default function Workspace() {
   };
   return (
     <div className="workspace">
-      <aside className={mobile ? "sidebar open" : "sidebar"}>
+      <aside
+        id="workspace-navigation"
+        className={mobile ? "sidebar open" : "sidebar"}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            setMobile(false);
+            document
+              .querySelector<HTMLButtonElement>(
+                'button[aria-label="Open navigation"]',
+              )
+              ?.focus();
+          }
+        }}
+      >
         <Link href="/" className="brand">
           <ShieldCheck size={23} />
           antibody
@@ -235,6 +248,8 @@ export default function Workspace() {
           <button
             className="icon-button mobile-menu"
             aria-label="Open navigation"
+            aria-expanded={mobile}
+            aria-controls="workspace-navigation"
             onClick={() => setMobile(true)}
           >
             <Menu />
@@ -426,7 +441,7 @@ export default function Workspace() {
                     <div className="panel-footer">
                       <p>
                         {active.status === "running"
-                          ? "Scanning real fixtures. This can take up to two minutes."
+                          ? "Scanning real fixtures and source. Each stage has a timeout."
                           : "Fixture checks establish a starting point, not a general accuracy guarantee."}
                       </p>
                       <button
