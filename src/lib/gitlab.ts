@@ -1,6 +1,6 @@
 import { parse, stringify } from "yaml";
 import type { Antibody } from "./model";
-export async function gitlab(path: string, options: RequestInit = {}) {
+export async function gitlabResponse(path: string, options: RequestInit = {}) {
   const token = process.env.GITLAB_TOKEN;
   if (!token)
     throw new Error(
@@ -30,7 +30,29 @@ export async function gitlab(path: string, options: RequestInit = {}) {
       `GitLab request failed (${res.status}). No success has been recorded.`,
     );
   }
-  return res.json();
+  return res;
+}
+export async function gitlab(path: string, options: RequestInit = {}) {
+  const res = await gitlabResponse(path, options);
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error("GitLab returned an empty response.");
+  const chunks: Uint8Array[] = [];
+  let bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > 2 * 1024 * 1024)
+        throw new Error(
+          "GitLab response exceeds the supported size. Select a smaller source scope.",
+        );
+      chunks.push(value);
+    }
+  } finally {
+    await reader.cancel();
+  }
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 export function preventionJob(id: string) {
   return stringify({

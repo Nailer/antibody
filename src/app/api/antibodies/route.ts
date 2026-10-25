@@ -1,3 +1,5 @@
+import { snapshotRepository } from "@/lib/repository";
+import { readJson, RequestError } from "@/lib/http";
 import { randomUUID } from "node:crypto";
 import { incidentInput } from "@/lib/model";
 import { listAntibodies, saveAntibody } from "@/lib/store";
@@ -7,16 +9,29 @@ export async function GET() {
 }
 export async function POST(req: Request) {
   try {
-    const parsed = incidentInput.safeParse(await req.json());
+    const parsed = incidentInput.safeParse(await readJson(req));
     if (!parsed.success)
       return Response.json(
         { error: parsed.error.issues[0].message },
         { status: 400 },
       );
+    const { repositorySource, ...input } = parsed.data;
+    if (repositorySource && input.files.length)
+      return Response.json(
+        { error: "Choose repository source or uploads, not both." },
+        { status: 400 },
+      );
+    const snapshot = repositorySource
+      ? await snapshotRepository(
+          repositorySource.projectId,
+          repositorySource.ref,
+        )
+      : {};
     const now = new Date().toISOString();
     return Response.json(
       await saveAntibody({
-        ...parsed.data,
+        ...input,
+        ...snapshot,
         id: randomUUID(),
         createdAt: now,
         updatedAt: now,
@@ -29,10 +44,13 @@ export async function POST(req: Request) {
       }),
       { status: 201 },
     );
-  } catch {
+  } catch (error) {
     return Response.json(
-      { error: "Invalid incident payload." },
-      { status: 400 },
+      {
+        error:
+          error instanceof Error ? error.message : "Invalid incident payload.",
+      },
+      { status: error instanceof RequestError ? error.status : 400 },
     );
   }
 }

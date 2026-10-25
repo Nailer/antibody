@@ -400,15 +400,56 @@ export default function Workspace() {
                       <h2>Exposure findings</h2>
                       <span className="count">{active.findings.length}</span>
                     </div>
+                    {active.repository && (
+                      <div className="boundary-note">
+                        <div>
+                          <strong>{active.repository.projectPath}</strong>
+                          <p>
+                            Revision {active.repository.ref} · commit{" "}
+                            {active.repository.commit.slice(0, 12)} ·{" "}
+                            {active.files.length} Python files
+                          </p>
+                          <p>
+                            {active.repository.complete
+                              ? "All supported Python files in the enumerated tree were fetched."
+                              : "Partial coverage: some files or tree entries were not fetched."}
+                          </p>
+                          {active.repository.skipped.length > 0 && (
+                            <details>
+                              <summary>
+                                {active.repository.skipped.length} skipped files
+                              </summary>
+                              {active.repository.skipped.map((s) => (
+                                <p key={s.path}>
+                                  {s.path}: {s.reason}
+                                </p>
+                              ))}
+                            </details>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     {active.findings.length ? (
                       <div className="findings">
                         {active.findings.map((f, i) => (
                           <div className="finding" key={i}>
                             <FileCode2 size={18} />
                             <div>
-                              <code>
-                                {f.path}:{f.line}
-                              </code>
+                              {active.repository ? (
+                                <a
+                                  href={`${active.repository.webUrl}/-/blob/${active.repository.commit}/${f.path.split("/").map(encodeURIComponent).join("/")}#L${f.line}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <code>
+                                    {f.path}:{f.line}
+                                  </code>
+                                </a>
+                              ) : (
+                                <code>
+                                  {f.path}:{f.line}
+                                </code>
+                              )}
                               <p>{f.message}</p>
                             </div>
                             <span className="status draft">Needs review</span>

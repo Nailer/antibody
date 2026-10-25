@@ -1,10 +1,31 @@
 import { z } from "zod";
+export const repositorySelection = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .max(200)
+    .regex(/^[a-zA-Z0-9_./-]+$/),
+  ref: z.string().min(1).max(200),
+});
+export type RepositorySnapshot = {
+  projectId: number;
+  projectPath: string;
+  webUrl: string;
+  ref: string;
+  commit: string;
+  fetchedAt: string;
+  scannedFiles: number;
+  complete: boolean;
+  skipped: { path: string; reason: string }[];
+  treeTruncated: boolean;
+};
 export const incidentInput = z.object({
   title: z.string().trim().min(5).max(120),
   incident: z.string().trim().min(20).max(12000),
   badCode: z.string().min(5).max(50000),
   fixedCode: z.string().min(5).max(50000),
   rule: z.string().min(10).max(30000),
+  repositorySource: repositorySelection.optional(),
   files: z
     .array(
       z.object({
@@ -42,6 +63,7 @@ export type Antibody = IncidentInput & {
   findings: Finding[];
   error?: string;
   approvedAt?: string;
+  repository?: RepositorySnapshot;
   events: { at: string; message: string }[];
 };
 export const starterRule = `rules:
