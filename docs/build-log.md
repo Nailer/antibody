@@ -69,3 +69,6 @@
 - Added recovery of matching orphaned rollout branches and live MR/pipeline/merge-policy inspection. The real existing MR is open, its pipeline is failed, and merge blocking is not configured; the UI reports these separately.
 - Verified owner-only SQLite backup and restore with seven actual local records, without overwriting the source.
 - Prepared a release checklist, honest submission draft and demo script; final publishing remains gated on real Duo/CI evidence.
+
+- Final local verification: 21 backend/scanner tests passed; three browser workflows passed including invalid-detector recovery. Production build, TypeScript and formatting passed.
+- Reviewed repository evidence/source links at desktop and mobile widths; fixed off-screen mobile-navigation visibility and added Escape/expanded-state semantics.

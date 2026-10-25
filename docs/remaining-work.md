@@ -112,7 +112,7 @@ Done when: a fresh local setup can run the core flow without Google Cloud and re
 
 ### T09 — final integrated product QA
 
-Status: open; depends on the selected release scope above.
+Status: local release checks passed (21 backend/scanner tests, three browser workflows, production build and visual review). Live Duo/CI acceptance remains blocked.
 
 - Run core tests and browser checks after the last feature changes.
 - Exercise empty, loading, failed, interrupted, approved and rolled-out states.
@@ -123,7 +123,7 @@ Done when: the release checklist contains evidence for every claimed working int
 
 ### T10 — hackathon submission and reproducibility
 
-Status: open. Verify the current official rules before final packaging.
+Status: official rules reviewed; release checklist, demo script and honest submission draft prepared. Public source confirmation, live Duo/CI proof, video and final submission remain open.
 
 - Reconcile implemented features with organizer requirements and eligible prize tracks.
 - Check repository visibility, license, required artifacts and submission deadline.
