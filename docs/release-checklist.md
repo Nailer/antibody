@@ -11,7 +11,7 @@ Updated 25 October 2026. This is a release checklist, not a claim that every gat
 - [x] Transactional run ownership, interrupted-run recovery and stale-write rejection tests.
 - [x] Desktop/mobile browser flow, refresh restoration and revision/import flow.
 - [x] SQLite backup and restore exercised against real persisted records.
-- [x] Production build, 21 backend/scanner tests, three browser workflows and desktop/mobile visual review passed for this increment.
+- [x] Production build, 23 backend/scanner tests, three browser workflows and desktop/mobile visual review passed for this increment.
 
 ## External gates
 
@@ -20,10 +20,11 @@ Updated 25 October 2026. This is a release checklist, not a claim that every gat
 - [x] Custom flow enabled; session 10020831 produced the actual detector and fixtures.
 - [x] Actual generated prevention job failed on the unsafe commit and passed on the correction; rollout merged after success.
 - [x] Public GitLab source with MIT license and run instructions is available.
-- [ ] Final demo video recorded and published publicly on YouTube; under three minutes.
+- [x] Narrated demo recorded and decoded successfully: 2:17, with English captions.
+- [ ] Demo uploaded to the agreed YouTube channel, public or unlisted with no password.
 - [ ] Devpost entry, team information, category and required links checked and submitted.
 
-Duo and CI access are now verified in the approved hackathon namespace. Project merge-policy editing returns 403 with the assigned Developer role; do not claim merge blocking until a Maintainer enables the policy.
+Duo and CI access are now verified in the approved hackathon namespace. Project merge-policy editing returns 403 with the assigned Developer role. [Maintainer request #2](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase/-/work_items/2) was sent to the official contributor-success team with user authorization. Do not claim merge blocking until the policy and failed-MR rejection are verified. See [integration handoff](integration-handoff.md).
 
 ## Submission fit
 
