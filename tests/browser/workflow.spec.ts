@@ -13,6 +13,13 @@ test("operator validates real source, approves evidence, exports, and survives r
       'import requests\nrequests.post("https://example.com", verify=False)\n',
     ),
   });
+  await page.getByRole("button", { name: "Add example (0/8)" }).click();
+  await page.getByLabel("Example name").fill("Trusted CA bundle");
+  await page
+    .getByLabel("Python code", { exact: true })
+    .fill(
+      'import requests\nrequests.get("https://example.invalid", verify="/etc/trusted-ca.pem")',
+    );
   await page.getByRole("button", { name: "Create draft antibody" }).click();
   await expect(
     page.getByRole("button", { name: "Run validation" }),
@@ -42,12 +49,26 @@ test("operator validates real source, approves evidence, exports, and survives r
   expect(await exported.text()).toContain("verify=False");
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "Give the next release a head start." }),
+    page.getByRole("heading", { name: "Approved for export" }),
+  ).toBeVisible();
+  expect(page.url()).toContain("view=detail");
+  expect(page.url()).toContain("id=");
+  await page.screenshot({ path: "/tmp/antibody-desktop.png", fullPage: true });
+  await page
+    .getByRole("button", { name: "Revise / import reviewed proposal" })
+    .click();
+  await page.getByLabel("Incident title").fill("Reviewed detector revision");
+  await page.getByRole("button", { name: "Save new draft version" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Reviewed detector revision" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button").filter({ hasText: "TLS regression" }).first(),
+    page.getByRole("button", { name: "Approve prevention pack" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "original evidence" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Approved for export" }),
   ).toBeVisible();
-  await page.screenshot({ path: "/tmp/antibody-desktop.png", fullPage: true });
 });
 test("mobile navigation, form, and landing have no horizontal overflow", async ({
   page,

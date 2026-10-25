@@ -26,7 +26,7 @@ Done when: a real GitLab pipeline runs and a Duo session produces a reviewable d
 
 ### T02 — complete detector proposal review and import
 
-Status: open. Depends on T01 for live Duo acceptance; review/import can be implemented independently.
+Status: review/import and structured session storage implemented. Live Duo acceptance depends on T01; remote session progress remains in GitLab.
 
 - Persist a structured synthesis session ID, URL and state rather than relying on event text.
 - Show session progress, failures and a direct return link.
@@ -50,7 +50,7 @@ Done when: the operator can scan a real repository at a pinned commit without ma
 
 ### T04 — verify prevention in an actual GitLab pipeline
 
-Status: partially complete. MR creation works; live enforcement remains unverified. Depends on T01 for hosted CI execution.
+Status: MR creation, retry/orphan recovery and live rollout-status inspection implemented. Hosted fail/pass enforcement remains blocked by T01.
 
 - Test in a controlled repository with safe bad/fixed fixtures.
 - Run the generated prevention job against both revisions.
@@ -65,7 +65,7 @@ Done when: real pipeline URLs prove fail/pass behavior and the UI distinguishes 
 
 ### T05 — recover interrupted and concurrent validations
 
-Status: open; independent of external services.
+Status: implemented and tested: transactional claiming, interrupted-run recovery and stale-writer rejection.
 
 - Prevent duplicate validation starts for the same record.
 - Identify interrupted runs after a restart; offer a safe retry.
@@ -76,7 +76,7 @@ Done when: restart and duplicate-request tests demonstrate records cannot remain
 
 ### T06 — broaden detector evidence
 
-Status: open.
+Status: implemented and tested, including rejection of an overmatching safe example.
 
 - Support multiple positive and negative fixtures per detector.
 - Include meaningful safe variants and known unsupported cases.
@@ -87,7 +87,7 @@ Done when: approval evaluates every supplied fixture, including negative cases, 
 
 ### T07 — finish navigation and error recovery
 
-Status: open; build alongside T02–T06.
+Status: core navigation, refresh, separate revisions and tab-local unfinished-text recovery implemented. Final visual/error QA continues.
 
 - Add stable detail URLs, refresh restoration and browser back navigation.
 - Preserve unfinished incident input after recoverable errors.
@@ -101,7 +101,7 @@ Done when: a user can recover from a failed scan/API request, share a local deta
 
 ### T08 — local operation and security hardening
 
-Status: partially complete. Loopback binding and credential-helper loading work.
+Status: local backup/restore verified; streamed request limits and reduced scanner subprocess credentials implemented. Final review continues.
 
 - Document SQLite backup/restore and test a recovery.
 - Verify payload and resource limits at API boundaries, including oversized requests.

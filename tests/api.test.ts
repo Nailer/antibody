@@ -93,3 +93,29 @@ test("unknown records and malformed input return useful errors", async () => {
     404,
   );
 });
+test("revising evidence produces a separate unvalidated draft", async () => {
+  const original = await (
+    await create(
+      new Request("http://localhost", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }),
+    )
+  ).json();
+  await updateAntibody(original.id, (x) => {
+    x.status = "approved";
+  });
+  const result = await act(
+    new Request("http://localhost", {
+      method: "POST",
+      body: JSON.stringify({ ...payload, title: "Reviewed proposal revision" }),
+    }),
+    { params: Promise.resolve({ id: original.id, action: "revise" }) },
+  );
+  assert.equal(result.status, 201);
+  const revised = await result.json();
+  assert.notEqual(revised.id, original.id);
+  assert.equal(revised.status, "draft");
+  assert.equal(revised.derivedFrom, original.id);
+  assert.deepEqual(revised.checks, []);
+});

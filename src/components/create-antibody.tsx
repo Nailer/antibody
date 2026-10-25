@@ -1,24 +1,61 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Plus, FileCode2, Clock, Loader2 } from "lucide-react";
 import { starterBad, starterFixed, starterRule } from "@/lib/model";
+import AdditionalFixtures, { type ExtraFixture } from "./additional-fixtures";
+import { type Antibody } from "@/lib/model";
 import RepositoryPicker, { type RepositoryChoice } from "./repository-picker";
 import { PageHeading } from "./workspace-ui";
 export default function Create({
   onCancel,
   onCreate,
+  initial,
 }: {
+  initial?: Antibody;
   onCancel: () => void;
   onCreate: (data: unknown) => Promise<void>;
 }) {
-  const [title, setTitle] = useState(""),
-    [incident, setIncident] = useState(""),
-    [bad, setBad] = useState(""),
-    [fixed, setFixed] = useState(""),
-    [rule, setRule] = useState(starterRule),
-    [files, setFiles] = useState<{ path: string; content: string }[]>([]),
+  const [title, setTitle] = useState(initial?.title || ""),
+    [incident, setIncident] = useState(initial?.incident || ""),
+    [bad, setBad] = useState(initial?.badCode || ""),
+    [fixed, setFixed] = useState(initial?.fixedCode || ""),
+    [rule, setRule] = useState(initial?.rule || starterRule),
+    [files, setFiles] = useState<{ path: string; content: string }[]>(
+      initial?.files || [],
+    ),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [extraFixtures, setExtraFixtures] = useState<ExtraFixture[]>(
+    initial?.extraFixtures || [],
+  );
+  const draftKey = initial
+    ? `antibody-draft-${initial.id}`
+    : "antibody-draft-new";
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(draftKey);
+      if (saved) {
+        const d = JSON.parse(saved);
+        setTitle(d.title || "");
+        setIncident(d.incident || "");
+        setBad(d.bad || "");
+        setFixed(d.fixed || "");
+        setRule(d.rule || starterRule);
+        setExtraFixtures(d.extraFixtures || []);
+      }
+    } catch {}
+  }, [draftKey]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        sessionStorage.setItem(
+          draftKey,
+          JSON.stringify({ title, incident, bad, fixed, rule, extraFixtures }),
+        );
+      } catch {}
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [draftKey, title, incident, bad, fixed, rule, extraFixtures]);
   const [sourceMode, setSourceMode] = useState("upload");
   const [repositorySource, setRepositorySource] = useState<RepositoryChoice>();
   return (
@@ -28,8 +65,14 @@ export default function Create({
       </button>
       <PageHeading
         eyebrow="NEW ANTIBODY"
-        title="Start with what failed."
-        description="Record the incident, supply both sides of the fix, and define a detector we can actually test."
+        title={
+          initial ? "Review a new detector version." : "Start with what failed."
+        }
+        description={
+          initial
+            ? "Paste reviewed proposal YAML and fixtures, or revise the existing detector. Saving creates a separate draft; the original evidence is retained."
+            : "Record the incident, supply both sides of the fix, and define a detector we can actually test."
+        }
       />
       <form
         className="create-layout"
@@ -48,10 +91,12 @@ export default function Create({
               badCode: bad,
               fixedCode: fixed,
               rule,
+              extraFixtures,
               files: sourceMode === "repository" ? [] : files,
               repositorySource:
                 sourceMode === "repository" ? repositorySource : undefined,
             });
+            sessionStorage.removeItem(draftKey);
           } catch (e) {
             setError((e as Error).message);
           } finally {
@@ -132,6 +177,10 @@ export default function Create({
               placeholder="Paste the corrected code"
             />
           </section>
+          <AdditionalFixtures
+            value={extraFixtures}
+            onChange={setExtraFixtures}
+          />
           <section className="panel form-panel">
             <h2>
               <span className="step-number">03</span> Detection rule
@@ -230,6 +279,10 @@ export default function Create({
               <br />
               Approval second.
             </h2>
+            <p className="muted">
+              Unfinished text is saved in this browser tab. File uploads must be
+              reselected after a refresh. Close the tab to clear unsaved text.
+            </p>
             <p>
               Your draft is saved before any scan starts. Run validation from
               the detail page, review the findings, then approve the pack for
@@ -253,7 +306,11 @@ export default function Create({
               ) : (
                 <Plus size={16} />
               )}{" "}
-              {busy ? "Saving incident…" : "Create draft antibody"}
+              {busy
+                ? "Saving incident…"
+                : initial
+                  ? "Save new draft version"
+                  : "Create draft antibody"}
             </button>
             <button
               type="button"

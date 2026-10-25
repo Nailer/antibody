@@ -7,9 +7,11 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 ## What works
 
 - Persistent incident history and validation evidence in SQLite.
-- Real Semgrep scans of bad/fixed Python fixtures and uploaded project files.
+- Real Semgrep scans of bad/fixed Python fixtures, up to eight additional examples, and uploaded or GitLab repository source.
 - Failed, running, validated and approved states with enforced approval gates.
 - Rule, evidence and GitLab CI downloads.
+- Pinned repository commits, source links and explicit skipped-file coverage.
+- Separate detector revisions, stable detail URLs and interrupted-run recovery.
 - Responsive desktop/mobile workspace, intentional empty/loading/error states.
 - Server-side GitLab adapters for rollout MRs and real Duo synthesis sessions.
 - Maintained Python Requests TLS detector as a labelled starting example.
@@ -130,3 +132,15 @@ MIT. See LICENSE.
 GitLab source is synchronized to https://gitlab.com/antibody-group1/Antibody-project.
 A real, unmerged rollout was created at https://gitlab.com/antibody-group1/Antibody-project/-/merge_requests/1.
 GitLab accepted the CI configuration as valid, but the first pipeline was blocked because the user account is not verified. Duo catalog creation returned a permission/resource error; synthesis is not yet live-verified. Google Cloud project `gather-483dd` is accessible but billing is disabled; no cloud deployment is claimed.
+
+## Local backup and recovery
+
+`npm run backup -- /absolute/path/new-backup.sqlite` creates a consistent SQLite snapshot, checks integrity and uses owner-only file permissions. Backups contain incident source; keep them private. Existing files are never overwritten.
+
+`npm run restore -- /absolute/path/backup.sqlite /absolute/path/new-data-directory` verifies the backup and restores into a new directory. Start with `ANTIBODY_DATA_DIR=/absolute/path/new-data-directory npm run local` to inspect the copy. Keep the original database until verification is complete. Cloud Firestore backup is outside this local tool's scope.
+
+## Review a detector revision
+
+Open an incident and choose **Revise / import reviewed proposal**. Paste the reviewed rule and fixture changes, add safe/unsafe examples, and save a new draft. Original approval/evidence is retained. Every fixture must pass validation before the revised pack can be approved.
+
+Repository source uses the documented [GitLab repository APIs](https://docs.gitlab.com/api/repositories/) and [file APIs](https://docs.gitlab.com/api/repository_files/). Local limits are disclosed in the interface; a partial scan is not proof that a repository is safe.

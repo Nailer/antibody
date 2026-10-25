@@ -26,6 +26,16 @@ export const incidentInput = z.object({
   fixedCode: z.string().min(5).max(50000),
   rule: z.string().min(10).max(30000),
   repositorySource: repositorySelection.optional(),
+  extraFixtures: z
+    .array(
+      z.object({
+        name: z.string().trim().min(1).max(80),
+        code: z.string().min(5).max(20000),
+        expectMatch: z.boolean(),
+      }),
+    )
+    .max(8)
+    .optional(),
   files: z
     .array(
       z.object({
@@ -64,6 +74,9 @@ export type Antibody = IncidentInput & {
   error?: string;
   approvedAt?: string;
   repository?: RepositorySnapshot;
+  run?: { id: string; pid: number; startedAt: string };
+  derivedFrom?: string;
+  synthesis?: { id: number; url: string; status: string; startedAt: string };
   events: { at: string; message: string }[];
 };
 export const starterRule = `rules:
