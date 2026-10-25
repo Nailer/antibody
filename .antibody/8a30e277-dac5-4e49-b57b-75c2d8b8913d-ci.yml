@@ -1,0 +1,7 @@
+antibody_8a30e277_dac5_4e49_b57b_75c2d8b8913d:
+  image: semgrep/semgrep:1.182.1
+  stage: test
+  script:
+    - semgrep scan --config .antibody/8a30e277-dac5-4e49-b57b-75c2d8b8913d.yml
+      --error --metrics=off .
+  allow_failure: false
