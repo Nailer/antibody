@@ -63,6 +63,22 @@ export default function RolloutStatus({ id }: { id: string }) {
                 ? "Project requires a successful pipeline before merging."
                 : "Project does not require a successful pipeline before merging. A failed check alone may not block a merge."}
             </p>
+            {status.history && (
+              <details open>
+                <summary>Recent pipeline evidence</summary>
+                {status.history.map((pipeline) => (
+                  <p key={pipeline.id}>
+                    <a
+                      href={pipeline.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {pipeline.sha.slice(0, 8)} · {pipeline.status}
+                    </a>
+                  </p>
+                ))}
+              </details>
+            )}
             <small>
               Checked {new Date(status.checkedAt).toLocaleTimeString()}
             </small>
