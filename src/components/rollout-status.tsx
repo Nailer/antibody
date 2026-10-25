@@ -2,6 +2,7 @@
 import { useState } from "react";
 type Status = {
   state: string;
+  history?: { id: number; status: string; sha: string; url: string }[];
   pipeline: { status: string; url: string } | null;
   requiresSuccessfulPipeline: boolean;
   checkedAt: string;

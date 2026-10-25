@@ -93,12 +93,26 @@ export async function GET(
       : process.env.GITLAB_PROJECT_ID;
     if (!project) throw Error("GitLab project is not configured.");
     const p = encodeURIComponent(project);
-    const [mr, info] = await Promise.all([
+    const [mr, info, pipelines] = await Promise.all([
       gitlab(`/projects/${p}/merge_requests/${iid}`),
       gitlab(`/projects/${p}`),
+      gitlab(`/projects/${p}/merge_requests/${iid}/pipelines?per_page=5`),
     ]);
     return Response.json({
       state: mr.state,
+      history: pipelines.map(
+        (pipeline: {
+          id: number;
+          status: string;
+          sha: string;
+          web_url: string;
+        }) => ({
+          id: pipeline.id,
+          status: pipeline.status,
+          sha: pipeline.sha,
+          url: pipeline.web_url,
+        }),
+      ),
       pipeline: mr.head_pipeline
         ? { status: mr.head_pipeline.status, url: mr.head_pipeline.web_url }
         : null,
