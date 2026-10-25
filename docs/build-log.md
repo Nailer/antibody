@@ -49,3 +49,11 @@
 - Verified the local API recovers the original live GitLab rollout MR and records its link.
 - Browser testing exposed Turbopack watching mutable runtime files; excluded configured scanner/data paths from build tracing to stop repeated full-page reloads.
 - Thirteen backend/scanner tests and TypeScript checks passed.
+
+## Repository integration (25 October 2026)
+
+- Rechecked GitLab: CI remains blocked by account verification; Duo catalog creation still returns a permission/resource error.
+- Added project search, revision selection and bounded Python repository fetches at immutable commit SHAs.
+- Repository evidence includes file limits, skipped files, coverage and source links; arbitrary clone URLs and execution are not accepted.
+- Live GitLab fetch successfully retrieved two labelled controlled fixtures from `antibody/controlled-scan-fixtures`, commit `b47ae455277b3bad4f06b51ee4410b4265164ea0`.
+- Sixteen tests passed, including pinned-source, skipped-source and streamed request-size checks.

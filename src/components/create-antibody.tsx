@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { ArrowLeft, Plus, FileCode2, Clock, Loader2 } from "lucide-react";
 import { starterBad, starterFixed, starterRule } from "@/lib/model";
+import RepositoryPicker, { type RepositoryChoice } from "./repository-picker";
 import { PageHeading } from "./workspace-ui";
 export default function Create({
   onCancel,
@@ -18,6 +19,8 @@ export default function Create({
     [files, setFiles] = useState<{ path: string; content: string }[]>([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [sourceMode, setSourceMode] = useState("upload");
+  const [repositorySource, setRepositorySource] = useState<RepositoryChoice>();
   return (
     <>
       <button className="back-button" onClick={onCancel}>
@@ -32,6 +35,10 @@ export default function Create({
         className="create-layout"
         onSubmit={async (e) => {
           e.preventDefault();
+          if (sourceMode === "repository" && !repositorySource) {
+            setError("Choose a GitLab project first.");
+            return;
+          }
           setBusy(true);
           setError("");
           try {
@@ -41,7 +48,9 @@ export default function Create({
               badCode: bad,
               fixedCode: fixed,
               rule,
-              files,
+              files: sourceMode === "repository" ? [] : files,
+              repositorySource:
+                sourceMode === "repository" ? repositorySource : undefined,
             });
           } catch (e) {
             setError((e as Error).message);
@@ -148,50 +157,69 @@ export default function Create({
               <span className="step-number">04</span> Look for the pattern
               elsewhere
             </h2>
-            <p className="muted">
-              Optional. Upload up to 30 Python files to scan. Files stay in this
-              workspace. No repository access is implied.
-            </p>
-            <label htmlFor="files" className="upload">
-              Choose Python files <Plus size={16} />
-            </label>
-            <input
-              id="files"
-              type="file"
-              accept=".py"
-              multiple
-              className="file-input"
-              onChange={async (e) => {
-                const selected = Array.from(e.target.files || []);
-                if (
-                  selected.length > 30 ||
-                  selected.some((f) => f.size > 100000)
-                ) {
-                  setError("Choose up to 30 files, each below 100 KB.");
-                  return;
-                }
-                const incoming = await Promise.all(
-                  selected.map(async (f) => ({
-                    path: f.name,
-                    content: await f.text(),
-                  })),
-                );
-                if (
-                  new Set(incoming.map((f) => f.path)).size !== incoming.length
-                ) {
-                  setError("File names must be unique.");
-                  return;
-                }
-                setFiles(incoming);
-              }}
-            />
-            {files.map((f) => (
-              <div className="attached-file" key={f.path}>
-                <FileCode2 size={15} />
-                {f.path}
-                <span>{f.content.length} characters</span>
-              </div>
-            ))}
+            <label htmlFor="source-mode">Source for exposure scanning</label>
+            <select
+              id="source-mode"
+              value={sourceMode}
+              onChange={(e) => setSourceMode(e.target.value)}
+            >
+              <option value="upload">Upload Python files</option>
+              <option value="repository">GitLab repository</option>
+            </select>
+            {sourceMode === "repository" ? (
+              <RepositoryPicker
+                value={repositorySource}
+                onChange={setRepositorySource}
+              />
+            ) : (
+              <>
+                <p className="muted">
+                  Optional. Upload up to 30 Python files to scan. Files stay in
+                  this workspace. No repository access is implied.
+                </p>
+                <label htmlFor="files" className="upload">
+                  Choose Python files <Plus size={16} />
+                </label>
+                <input
+                  id="files"
+                  type="file"
+                  accept=".py"
+                  multiple
+                  className="file-input"
+                  onChange={async (e) => {
+                    const selected = Array.from(e.target.files || []);
+                    if (
+                      selected.length > 30 ||
+                      selected.some((f) => f.size > 100000)
+                    ) {
+                      setError("Choose up to 30 files, each below 100 KB.");
+                      return;
+                    }
+                    const incoming = await Promise.all(
+                      selected.map(async (f) => ({
+                        path: f.name,
+                        content: await f.text(),
+                      })),
+                    );
+                    if (
+                      new Set(incoming.map((f) => f.path)).size !==
+                      incoming.length
+                    ) {
+                      setError("File names must be unique.");
+                      return;
+                    }
+                    setFiles(incoming);
+                  }}
+                />
+                {files.map((f) => (
+                  <div className="attached-file" key={f.path}>
+                    <FileCode2 size={15} />
+                    {f.path}
+                    <span>{f.content.length} characters</span>
+                  </div>
+                ))}
+              </>
+            )}
           </section>
         </div>
         <aside>

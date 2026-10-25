@@ -70,6 +70,7 @@ export async function GET(
           title: a.title,
           approvedAt: a.approvedAt,
           checks: a.checks,
+          repository: a.repository,
           findings: a.findings,
           events: a.events,
           limitations:
