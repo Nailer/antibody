@@ -11,7 +11,7 @@ import { resolve, dirname, join } from "node:path";
 process.umask(0o077);
 const [action, arg, target] = process.argv.slice(2);
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
-if (process.env.ANTIBODY_STORE === "firestore") {
+if (["firestore", "postgres"].includes(process.env.ANTIBODY_STORE)) {
   console.error(
     "This tool backs up local SQLite only. Select the intended local database explicitly.",
   );

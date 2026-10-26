@@ -1,0 +1,25 @@
+# Free web service; connect an external persistent PostgreSQL database.
+services:
+  - type: web
+    name: antibody
+    runtime: docker
+    repo: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase
+    branch: main
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    envVars:
+      - key: ANTIBODY_STORE
+        value: postgres
+      - key: DATABASE_URL
+        sync: false
+      - key: ACCESS_TOKEN
+        sync: false
+      - key: GITLAB_TOKEN
+        sync: false
+      - key: GITLAB_URL
+        value: https://gitlab.com
+      - key: GITLAB_PROJECT_ID
+        value: "88074697"
+      - key: GITLAB_FLOW_CONSUMER_ID
+        value: "13153303"

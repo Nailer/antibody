@@ -93,3 +93,10 @@
 - With explicit user permission, sent Maintainer request #2 to the official contributor-success team.
 - Located the existing Antibody Devpost draft (1259399), inspected required fields and confirmed YouTube accepts public or unlisted visibility. No duplicate entry or eligibility attestations were submitted.
 - Updated stale release counts and separated recorded demo completion from pending publication. Added a concrete post-Maintainer verification procedure.
+
+## Persistent hosting preparation — 26 October
+
+- User requires free hosting only; Railway signup is unavailable. Existing Render account is accessible and a free-service draft is prepared.
+- Added PostgreSQL persistence for an independent free web service and a dedicated Neon database. Actual provisioning and end-to-end verification remain pending.
+- Added private readiness checks, fail-closed container startup, volume ownership preparation with privilege drop, and container restart/scanner checks in CI.
+- Local checks passed: 25 tests, with the PostgreSQL integration check reserved for a real disposable CI database; TypeScript passed. No paid resources provisioned.
