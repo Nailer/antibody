@@ -111,3 +111,10 @@
 - Dedicated fine-grained GitLab credential expires 25 November 2026. Verified real Duo output retrieval, started session 10077907, and created reviewable rollout MR !8 from the hosted application.
 - Added configured-project discovery for scoped tokens instead of expanding account-wide access. Regression test and TypeScript passed; hosted CI remains the merge gate for the change.
 - Added the owner testing walkthrough and explicit free-host cold-start and token-rotation notes. Existing Maintainer-only merge-policy gate remains accurately reported as disabled.
+
+## Public product landing page — 26 October
+
+- Replaced the short homepage with a complete explanation of the product: incident context, inputs and outputs, four-step workflow, intended users and practical FAQs.
+- Added a keyboard-accessible four-stage TLS walkthrough, clearly identified as illustrative rather than a live scan. Linked actual unsafe/fixed GitLab job evidence.
+- Kept the public landing page at `/` and the protected workspace at `/app`. All calls to action lead to real routes, anchors or source documentation; no public signup is implied.
+- Scoped landing styles separately from workspace styles. Reviewed desktop, 320/390 px phone and 768 px tablet layouts; no horizontal overflow. Verified example tabs, arrow-key navigation and FAQ expansion. Production build and TypeScript passed.
