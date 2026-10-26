@@ -19,6 +19,8 @@ services:
         sync: false
       - key: GITLAB_URL
         value: https://gitlab.com
+      - key: GITLAB_PROJECT_SCOPE
+        value: configured
       - key: GITLAB_PROJECT_ID
         value: "88074697"
       - key: GITLAB_FLOW_CONSUMER_ID

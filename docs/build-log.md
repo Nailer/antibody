@@ -100,3 +100,14 @@
 - Added PostgreSQL persistence for an independent free web service and a dedicated Neon database. Actual provisioning and end-to-end verification remain pending.
 - Added private readiness checks, fail-closed container startup, volume ownership preparation with privilege drop, and container restart/scanner checks in CI.
 - Local checks passed: 25 tests, with the PostgreSQL integration check reserved for a real disposable CI database; TypeScript passed. No paid resources provisioned.
+
+## Free hosted release — 26 October
+
+- Provisioned Render Free service `antibody-workspace` in Oregon and Neon Free PostgreSQL with explicit owner approval. No paid compute, disks or subscriptions were selected.
+- Migrated 27 existing records transactionally, preserving 11 approved packs and original IDs/history. Credentials and the backup remain private and ignored by Git.
+- Public HTTPS: https://antibody-workspace.onrender.com. Protected app/API requests reject anonymous access; readiness confirms scanner and database availability.
+- Real hosted Semgrep acceptance test passed unsafe/fixed fixtures, found the controlled uploaded source, blocked premature approval, approved the validated pack and produced all three exports.
+- Restarted the web service and confirmed the approved test record survived in PostgreSQL.
+- Dedicated fine-grained GitLab credential expires 25 November 2026. Verified real Duo output retrieval, started session 10077907, and created reviewable rollout MR !8 from the hosted application.
+- Added configured-project discovery for scoped tokens instead of expanding account-wide access. Regression test and TypeScript passed; hosted CI remains the merge gate for the change.
+- Added the owner testing walkthrough and explicit free-host cold-start and token-rotation notes. Existing Maintainer-only merge-policy gate remains accurately reported as disabled.

@@ -16,6 +16,28 @@ export async function GET(req: Request) {
       });
     }
     const search = (query.get("search") || "").slice(0, 100);
+    if (process.env.GITLAB_PROJECT_SCOPE === "configured") {
+      const configured = process.env.GITLAB_PROJECT_ID;
+      if (!configured)
+        throw new Error("The workspace project is not configured.");
+      const p = await gitlab(`/projects/${encodeURIComponent(configured)}`);
+      const matches = String(p.path_with_namespace)
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      return Response.json({
+        projects: matches
+          ? [
+              {
+                id: p.id,
+                path: p.path_with_namespace,
+                defaultBranch: p.default_branch,
+              },
+            ]
+          : [],
+        limited: false,
+        scope: "configured",
+      });
+    }
     const projects = await gitlab(
       `/projects?membership=true&archived=false&per_page=50&simple=true&search=${encodeURIComponent(search)}`,
     );
