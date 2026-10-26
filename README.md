@@ -150,3 +150,9 @@ The application can retrieve live Duo status and proposed output for review. The
 Open an incident and choose **Revise / import reviewed proposal**. Paste the reviewed rule and fixture changes, add safe/unsafe examples, and save a new draft. Original approval/evidence is retained. Every fixture must pass validation before the revised pack can be approved.
 
 Repository source uses the documented [GitLab repository APIs](https://docs.gitlab.com/api/repositories/) and [file APIs](https://docs.gitlab.com/api/repository_files/). Local limits are disclosed in the interface; a partial scan is not proof that a repository is safe.
+
+## Independent hosted deployment
+
+The free-hosting configuration uses a Render Docker web service with PostgreSQL on Neon. The public address is independent of a local workstation; the free web service can have a cold start after idle time. `render.yaml` selects the free plan and deliberately does not attach a paid disk. The database connection and workspace/GitLab credentials are private runtime secrets. See [persistent hosting](docs/persistent-hosting.md) for requirements and verification; a configuration file alone is not evidence of a live deployment.
+
+Set `ANTIBODY_STORE=postgres` and `DATABASE_URL` for hosted PostgreSQL. Updates use row-locked transactions to preserve run ownership and approval evidence. The PostgreSQL integration test uses `ANTIBODY_TEST_DATABASE_URL`, not an ambient production database URL. `/health` returns readiness without exposing configuration or records.

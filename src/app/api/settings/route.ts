@@ -20,7 +20,9 @@ export async function GET() {
     storage:
       process.env.ANTIBODY_STORE === "firestore"
         ? "Firestore · durable cloud workspace"
-        : "SQLite · local persistent workspace",
+        : process.env.ANTIBODY_STORE === "postgres"
+          ? "PostgreSQL · durable hosted workspace"
+          : "SQLite · local persistent workspace",
     accessProtected: !!process.env.ACCESS_TOKEN,
   });
 }

@@ -39,3 +39,7 @@ GitLab OAuth credentials are suitable for validating this integration. An unatte
 Repository source is retrieved through GitLab APIs at an immutable commit SHA, with a 30-file, 100 KB/file, 400 KB/source and 1,000-tree-entry ceiling. Partial coverage is explicit. Source links reference that same commit. No repository code is executed. A reviewed revision always starts as a new draft; validation and approval do not transfer. For repository-backed revisions, the original pinned source is retained.
 
 The scanner subprocess receives only runtime/path/certificate settings, not GitLab or application access tokens. Source and fixtures are stored locally in the operator database; unsaved text is temporarily stored in the browser tab's session storage. Closing the tab removes that unsaved text. Approved evidence exports contain findings and provenance rather than the whole uploaded source corpus.
+
+## PostgreSQL for free container hosting
+
+Render's free local filesystem is ephemeral. The PostgreSQL adapter keeps the existing Antibody document model in a dedicated table and uses SELECT FOR UPDATE transactions for mutations, preventing concurrent validations from overwriting one another. Shared-store recovery uses run expiry rather than comparing process IDs across hosts. Local SQLite and optional Firestore remain available. The hosted container must have a strong access password; readiness checks scanner availability and a database read separately from the authenticated GitLab integration checks.

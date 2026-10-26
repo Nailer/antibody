@@ -1,3 +1,9 @@
+import {
+  postgresList,
+  postgresGet,
+  postgresSave,
+  postgresUpdate,
+} from "./postgres";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
@@ -7,6 +13,9 @@ let db: DatabaseSync;
 let cloud: Promise<Firestore> | undefined;
 const collection = "antibody_records";
 export const usesCloudStore = () => process.env.ANTIBODY_STORE === "firestore";
+export const usesPostgresStore = () =>
+  process.env.ANTIBODY_STORE === "postgres";
+export const usesSharedStore = () => usesCloudStore() || usesPostgresStore();
 function database() {
   if (!db) {
     const dir = resolve(
@@ -39,6 +48,7 @@ function encode(a: Antibody) {
   return { body, createdAt: a.createdAt };
 }
 export async function listAntibodies(): Promise<Antibody[]> {
+  if (usesPostgresStore()) return postgresList();
   if (usesCloudStore()) {
     const result = await (
       await firestore()
@@ -55,6 +65,7 @@ export async function listAntibodies(): Promise<Antibody[]> {
   ).map((r) => JSON.parse(r.body));
 }
 export async function getAntibody(id: string): Promise<Antibody | undefined> {
+  if (usesPostgresStore()) return postgresGet(id);
   if (usesCloudStore()) {
     const d = await (await firestore()).collection(collection).doc(id).get();
     return d.exists ? JSON.parse(d.get("body")) : undefined;
@@ -66,6 +77,7 @@ export async function getAntibody(id: string): Promise<Antibody | undefined> {
 }
 export async function saveAntibody(a: Antibody): Promise<Antibody> {
   a.updatedAt = new Date().toISOString();
+  if (usesPostgresStore()) return postgresSave(a);
   if (usesCloudStore())
     await (await firestore()).collection(collection).doc(a.id).set(encode(a));
   else
@@ -80,6 +92,7 @@ export async function updateAntibody(
   id: string,
   fn: (a: Antibody) => void,
 ): Promise<Antibody> {
+  if (usesPostgresStore()) return postgresUpdate(id, fn);
   if (usesCloudStore()) {
     const client = await firestore();
     const ref = client.collection(collection).doc(id);

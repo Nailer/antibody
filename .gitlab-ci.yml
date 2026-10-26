@@ -4,6 +4,9 @@ stages:
 verify:
   image: node:24-bookworm
   stage: verify
+  services:
+    - name: postgres:16
+      alias: postgres
   before_script:
     - apt-get update && apt-get install -y python3-venv
     - python3 -m venv .venv
@@ -14,5 +17,36 @@ verify:
     - npm run build
   variables:
     NEXT_TELEMETRY_DISABLED: "1"
+    POSTGRES_DB: antibody_test
+    POSTGRES_USER: antibody_ci
+    POSTGRES_PASSWORD: ci-only-database-password
+    ANTIBODY_TEST_DATABASE_URL: postgres://antibody_ci:ci-only-database-password@postgres:5432/antibody_test
 include:
   - local: .antibody/8a30e277-dac5-4e49-b57b-75c2d8b8913d-ci.yml
+
+container-smoke:
+  stage: verify
+  image: docker:27-cli
+  services:
+    - name: docker:27-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - changes:
+        - Dockerfile
+        - scripts/container-entrypoint.sh
+        - tests/container/**/*
+        - src/app/health/**/*
+  script:
+    - docker build -t antibody:ci .
+    - docker run -d --name antibody-smoke --memory=512m -e ACCESS_TOKEN=ci-only-password-never-used-for-hosting -v antibody-ci-data:/app/.data antibody:ci
+    - docker cp tests/container/smoke.mjs antibody-smoke:/tmp/smoke.mjs
+    - docker exec -e ACCESS_TOKEN=ci-only-password-never-used-for-hosting antibody-smoke node /tmp/smoke.mjs
+    - docker restart antibody-smoke
+    - docker exec -e ACCESS_TOKEN=ci-only-password-never-used-for-hosting antibody-smoke node /tmp/smoke.mjs --persisted
+  after_script:
+    - docker logs antibody-smoke || true
+    - docker rm -f antibody-smoke || true
+    - docker volume rm antibody-ci-data || true

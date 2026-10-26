@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import type { Antibody } from "./model";
-import { usesCloudStore, updateAntibody } from "./store";
+import { usesSharedStore, updateAntibody } from "./store";
 import { RequestError } from "./http";
 export function interrupted(a: Antibody) {
   if (a.status !== "running") return false;
   if (!a.run) return true;
   if (Date.now() - Date.parse(a.run.startedAt) > 10 * 60 * 1000) return true;
-  if (usesCloudStore()) return false;
+  if (usesSharedStore()) return false;
   try {
     process.kill(a.run.pid, 0);
     return false;
