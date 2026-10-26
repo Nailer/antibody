@@ -76,7 +76,7 @@ test("mobile navigation, form, and landing have no horizontal overflow", async (
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Fix it once/ }),
+    page.getByRole("heading", { name: /You fixed the bug/ }),
   ).toBeVisible();
   expect(
     await page.evaluate(
