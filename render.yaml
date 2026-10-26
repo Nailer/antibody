@@ -6,7 +6,7 @@ services:
     repo: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase
     branch: main
     plan: free
-    region: frankfurt
+    region: oregon
     healthCheckPath: /health
     envVars:
       - key: ANTIBODY_STORE

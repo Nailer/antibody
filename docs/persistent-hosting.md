@@ -27,3 +27,7 @@ The configured project is 88074697 and Duo flow consumer is 13153303. No Google 
 7. Verify the public HTTPS address from a separate client. Confirm available memory during validation; upgrade only within the user's approved budget.
 
 The prepared configuration is not proof of deployment. Record the actual service URL, plan, disk and test results after provisioning succeeds.
+
+## Migrating approved evidence
+
+After explicit permission to transfer incident source/evidence, take a consistent SQLite backup and run `node scripts/migrate-postgres.mjs /private/path/backup.sqlite` with the destination DATABASE_URL privately supplied through the process environment. The migration preserves original IDs, statuses, checks and approval history. It imports transactionally and never overwrites existing destination records; retrying is safe. Never place the connection string in a shell command, commit, log or browser-visible URL.

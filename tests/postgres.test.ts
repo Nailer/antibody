@@ -2,6 +2,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { Pool } from "pg";
+import { DatabaseSync } from "node:sqlite";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
 import { saveAntibody, getAntibody, updateAntibody } from "../src/lib/store";
 import { closePostgres } from "../src/lib/postgres";
 import { claimRun, updateRun } from "../src/lib/runs";
@@ -22,6 +27,8 @@ test(
     process.env.DATABASE_URL = url;
     const now = new Date().toISOString();
     const id = randomUUID();
+    const migratedId = randomUUID();
+    const folder = await mkdtemp(join(tmpdir(), "antibody-migration-"));
     const a: Antibody = {
       id,
       title: "Postgres transaction test",
@@ -65,11 +72,43 @@ test(
         /no longer current/,
       );
       assert.equal((await getAntibody(id))?.status, "running");
+      const backup = join(folder, "backup.sqlite");
+      const sqlite = new DatabaseSync(backup);
+      sqlite.exec(
+        "CREATE TABLE antibodies (id TEXT PRIMARY KEY, body TEXT NOT NULL)",
+      );
+      const preserved = {
+        ...a,
+        id: migratedId,
+        title: "Preserved migration fixture",
+        status: "approved",
+        approvedAt: now,
+      };
+      for (const record of [a, preserved])
+        sqlite
+          .prepare("INSERT INTO antibodies VALUES (?,?)")
+          .run(record.id, JSON.stringify(record));
+      sqlite.close();
+      const migrate = () =>
+        execFileSync(
+          process.execPath,
+          [resolve("scripts/migrate-postgres.mjs"), backup],
+          { env: { ...process.env, DATABASE_URL: url }, encoding: "utf8" },
+        );
+      assert.match(migrate(), /Imported 1 records; preserved 1 existing/);
+      assert.equal((await getAntibody(migratedId))?.status, "approved");
+      assert.equal((await getAntibody(migratedId))?.approvedAt, now);
+      assert.equal((await getAntibody(id))?.status, "running");
+      assert.match(migrate(), /Imported 0 records; preserved 2 existing/);
     } finally {
       const cleanup = new Pool({ connectionString: url });
-      await cleanup.query("DELETE FROM antibody_records WHERE id=$1", [id]);
+      await cleanup.query(
+        "DELETE FROM antibody_records WHERE id=ANY($1::text[])",
+        [[id, migratedId]],
+      );
       await cleanup.end();
       await closePostgres();
+      await rm(folder, { recursive: true, force: true });
     }
   },
 );
