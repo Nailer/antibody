@@ -6,7 +6,7 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 
 ## What works
 
-- Persistent incident history and validation evidence in SQLite.
+- Persistent incident history and validation evidence in SQLite locally or PostgreSQL when hosted.
 - Real Semgrep scans of bad/fixed Python fixtures, up to eight additional examples, and uploaded or GitLab repository source.
 - Failed, running, validated and approved states with enforced approval gates.
 - Rule, evidence and GitLab CI downloads.
@@ -17,6 +17,10 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 - Maintained Python Requests TLS detector as a labelled starting example.
 
 **Integration status:** The real custom Duo flow is enabled in the public hackathon project. Session 10020831 completed and proposed a detector; actual Semgrep validation passed all six supplied examples and found the controlled unsafe source. A real GitLab prevention job rejected the unsafe revision. See [live integration evidence](docs/evidence/README.md). Proposal review/import remains an explicit operator step. Deployment on Google Cloud is deferred.
+
+## Hosted workspace
+
+Open [Antibody](https://antibody-workspace.onrender.com/app) with the owner-provided workspace credentials. See [the testing walkthrough](docs/live-testing.md). The free service may take about a minute to wake after inactivity. Records are stored in external PostgreSQL.
 
 ## Interface
 
