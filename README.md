@@ -16,7 +16,7 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 - Server-side GitLab adapters for rollout MRs and real Duo synthesis sessions.
 - Maintained Python Requests TLS detector as a labelled starting example.
 
-**Integration status:** The real custom Duo flow is enabled in the public hackathon project. Session 10020831 completed and proposed a detector; actual Semgrep validation passed all six supplied examples and found the controlled unsafe source. A real GitLab prevention job rejected the unsafe revision. See [live integration evidence](docs/evidence/README.md). Proposal review/import remains an explicit operator step. Deployment on Google Cloud is deferred.
+**Integration status:** The real custom Duo flow is enabled in the public hackathon project. Session 10020831 completed and proposed a detector; actual Semgrep validation passed all six supplied examples and found the controlled unsafe source. A real GitLab prevention job rejected the unsafe revision. See [live integration evidence](docs/evidence/README.md). Proposal review/import remains an explicit operator step. The live release uses Render Free and Neon PostgreSQL; Google Cloud is not deployed.
 
 ## Hosted workspace
 
@@ -47,6 +47,9 @@ The example is not prepopulated history. Uploaded fixtures are actually scanned.
 | Variable                | Purpose                                                                 |
 | ----------------------- | ----------------------------------------------------------------------- |
 | ACCESS_TOKEN            | Required for protected remote access; HTTP Basic username is `antibody` |
+| ANTIBODY_STORE          | `sqlite` locally or `postgres` for the hosted release                   |
+| DATABASE_URL            | Private TLS PostgreSQL connection when using `postgres`                 |
+| GITLAB_PROJECT_SCOPE    | `configured` for a token limited to GITLAB_PROJECT_ID                   |
 | ANTIBODY_DATA_DIR       | Persistent SQLite directory; default `.data`                            |
 | SEMGREP_BIN             | Local executable; default `.venv/bin/semgrep`                           |
 | GITLAB_URL              | HTTPS GitLab origin; default https://gitlab.com                         |
@@ -65,7 +68,7 @@ Never commit credentials or paste them into an incident. Remote access requires 
 5. Start a Duo session from an incident. Inspect the proposed detector and fixtures in GitLab.
 6. Import reviewed YAML into a new draft; execute local validation before approval.
 
-The flow definition follows the documented registry v1 structure. Namespace-specific creation, tool permissions and live execution still require validation. See [GitLab custom flows](https://docs.gitlab.com/user/duo_agent_platform/flows/custom/) and [Flows API](https://docs.gitlab.com/api/duo_agent_platform_flows/).
+The flow definition follows the registry v1 structure. Flow 1019702 and enabled consumer 13153303 have completed real sessions in the provisioned showcase project; see the integration evidence below. See [GitLab custom flows](https://docs.gitlab.com/user/duo_agent_platform/flows/custom/) and [Flows API](https://docs.gitlab.com/api/duo_agent_platform_flows/).
 
 ## Rollout
 
@@ -95,9 +98,9 @@ docker run --rm -p 8080:8080 --env-file .env.local \
   -v antibody-data:/app/.data antibody
 ```
 
-Provide ACCESS_TOKEN and HTTPS when exposing it beyond localhost. The application is single-operator software. The Dockerfile is prepared but container execution depends on an available Docker runtime.
+Provide ACCESS_TOKEN and HTTPS when exposing it beyond localhost. The application is single-operator software. The container has passed a real 512 MB CI smoke test with Semgrep execution and restart persistence. Local Docker commands still require a Docker runtime. ACCESS_TOKEN must contain at least 24 characters.
 
-**Google Cloud Run:** compatible container interface, but use `ANTIBODY_STORE=firestore` for durable cloud persistence. The adapter uses runtime service-account credentials. Live cloud persistence must still be verified in the selected project. No cloud resources have been provisioned.
+**Google Cloud Run:** compatible container interface, but use `ANTIBODY_STORE=firestore` for durable cloud persistence. The adapter uses runtime service-account credentials. Live cloud persistence must still be verified in the selected project. This optional Google Cloud path is not deployed; the working hosted release uses Render and Neon.
 
 ## Repository structure
 
@@ -106,7 +109,8 @@ src/app/                  Marketing, workspace and HTTP routes
 src/components/           Workspace, incident creation and shared UI
 src/lib/model.ts          Input validation and domain types
 src/lib/engine.ts         Real scanner execution and evidence transitions
-src/lib/store.ts          SQLite / Firestore persistence
+src/lib/store.ts          SQLite / PostgreSQL / Firestore dispatch
+src/lib/postgres.ts       Hosted transactions and durable records
 src/lib/gitlab.ts         Rollout and Duo REST adapters
 .gitlab/flows/            Duo custom flow definition
 .gitlab-ci.yml            Project verification pipeline
@@ -121,7 +125,7 @@ One supported language and one supplied rule per antibody. Two fixtures do not e
 
 ## Hackathon
 
-Intended entry: GitLab Life After Code, Start Fresh / Supervised. The central sponsor integration is Duo incident-to-rule synthesis, followed by executable validation and a human-reviewed prevention MR. A successful live Duo run and real GitLab enforcement demonstration remain required before calling it submission-ready.
+Submission fit: **Path A — Start Fresh / Assisted**. Proposal review/import, validation, approval and rollout are explicit operator steps. The sponsor integration is real Duo incident-to-rule synthesis, followed by executable Semgrep validation and a human-reviewed prevention MR. Actual unsafe/fixed GitLab job evidence is linked below. The new public demo video and final Devpost submission remain open gates. Do not describe this workflow as Supervised or Hands-off, or claim enabled merge blocking. See [release readiness](docs/release-checklist.md).
 
 ## License
 
