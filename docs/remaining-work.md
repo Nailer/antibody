@@ -1,3 +1,5 @@
+> Latest release status: see [release-checklist.md](release-checklist.md), audited 26 October 2026. Older task notes below are historical and do not replace the current hosted/submission gates.
+
 # Antibody execution backlog
 
 Updated: 25 October 2026. Google Cloud is deferred. Continue with the local single-operator product and GitLab integration.

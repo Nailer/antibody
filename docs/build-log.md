@@ -118,3 +118,11 @@
 - Added a keyboard-accessible four-stage TLS walkthrough, clearly identified as illustrative rather than a live scan. Linked actual unsafe/fixed GitLab job evidence.
 - Kept the public landing page at `/` and the protected workspace at `/app`. All calls to action lead to real routes, anchors or source documentation; no public signup is implied.
 - Scoped landing styles separately from workspace styles. Reviewed desktop, 320/390 px phone and 768 px tablet layouts; no horizontal overflow. Verified example tabs, arrow-key navigation and FAQ expansion. Production build and TypeScript passed.
+
+## Pre-demo submission audit — 26 October
+
+- Verified live hosted readiness, protected access, 29 saved records, scoped repository discovery, actual Duo output and retained approval after the landing release.
+- Verified public source and visibly detected MIT license. Main pipeline 2991281022 passed. Merge-policy setting remains disabled; Maintainer request #2 has no reply.
+- Inspected the existing Devpost draft: 2/5 steps complete, project details and additional information still empty. Prepared technical fields without submitting eligibility assertions or sharing credentials.
+- Corrected stale deployment/integration documentation, autonomy classification and video-visibility guidance. Prepared private judge instructions locally; credential disclosure and eligibility facts require owner input.
+- Feature freeze: no new languages, account system, Google Cloud migration or autonomous merge changes before the demo. Final video, private judge access and actual submitted-status verification remain release gates.

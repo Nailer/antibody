@@ -29,16 +29,45 @@ Additional negative examples challenge overly broad rules. Separate revisions pr
 
 ## Built with
 
-TypeScript, Next.js, React, SQLite, Semgrep, GitLab repository/merge-request/pipeline APIs and a real GitLab Duo custom flow integration. Firestore/Cloud Run preparation is optional and has not been deployed.
+TypeScript, Next.js, React, Node.js 24, PostgreSQL (Neon), SQLite for local development, Semgrep, Docker, Render, GitLab CI/CD, GitLab repository/merge-request/pipeline APIs and a real GitLab Duo custom flow. Google Cloud is not deployed.
 
 ## Verified artifacts and final submission gates
 
 - Verified Duo session and detector: see the evidence links above and `docs/evidence/`.
 - Verified GitLab fail/pass job URLs: see above.
 - [Public MIT-licensed source and setup instructions](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43693041/showcase).
-- Narrated 2:17 video is recorded; upload to the agreed YouTube channel remains. The entry accepts public or unlisted visibility with no password.
-- Confirmed team and final autonomy category consistent with demonstrated behavior.
+- Narrated 2:17 video is recorded; upload to the agreed YouTube channel remains. The form mentions public or unlisted, but the official rules require publicly visible YouTube footage. Use Public, under three minutes.
+- Team and eligibility facts still require owner confirmation. Recommended category: Start Fresh: Assisted, matching explicit human review/import and approval.
 
-Deployment is deferred for the intended Start Fresh path. Final compliance is checked against https://gitlab-transcend.devpost.com/ and its official rules/resources.
+Live deployment: https://antibody-workspace.onrender.com/ (landing) and /app (protected workspace). Provide credentials only in Devpost’s private judge testing field after owner authorization. Path A does not require Google Cloud. Final compliance is checked against https://gitlab-transcend.devpost.com/ and its official rules/resources.
 
 The existing entry is [Antibody](https://devpost.com/software/antibody-ahd7om), submission 1259399 for Life After Code. It was inspected on 25 October and remains a draft with 2/5 steps complete. Do not create a duplicate.
+
+## Submission field guidance
+
+- Path/autonomy: Start Fresh: Assisted.
+- Lifecycle stages with direct evidence: Verify (positive/negative fixture tests), Secure (Semgrep findings), Configure (generated detector/job/root CI configuration). Do not select unrelated stages merely because the application has a dashboard or is hosted.
+- Public try-it links: hosted landing page and canonical GitLab repository.
+- Judge instructions: private instructions prepared locally; password must never go into public story, screenshots or README.
+- Environmentally Impactful prize: do not opt in without measured, defensible sustainability evidence.
+- Team, age, jurisdiction and conflicts: complete only from confirmed facts. Do not finalize or accept terms automatically.
+
+## Inspiration
+
+Fixing an incident in one file does not turn the postmortem into a reusable check. Antibody keeps the original failure, the correction, and the evidence behind a prevention rule connected.
+
+## How we built it
+
+A Next.js/TypeScript workspace stores incident history and runs bounded Semgrep scans without executing supplied source. GitLab Duo's custom flow proposes a detector and fixtures. A person reviews/imports the proposal, validates both unsafe and safe examples, then approves an export or reviewable GitLab MR. The hosted release uses transactional PostgreSQL; credentials remain server-side.
+
+## Challenges and lessons
+
+AI output is not validation. We kept proposal, validation, human approval and rollout as separate states. Positive/negative examples challenge overly broad detectors; repository snapshots retain exact commits and disclose skipped files. Real GitLab jobs established unsafe-code rejection and corrected-code acceptance, while live project policy remains separately reported rather than assumed.
+
+## Accomplishments
+
+Real Duo sessions, generated-rule validation with six passing examples and a controlled finding, actual CI fail/pass proof, a reviewed rollout, durable free hosting, and a public product explanation. Current main passed 27 backend/scanner/PostgreSQL checks and a production build; container validation/restart checks also passed.
+
+## What's next
+
+Expand carefully to more representative rule packs and languages, add stronger evaluation datasets, and improve team access and orchestration. These are future work, not current demo claims.
