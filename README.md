@@ -8,7 +8,7 @@ Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate
 > ## Public demo access
 > Open the live workspace at [antibody-workspace.onrender.com/app](https://antibody-workspace.onrender.com/app).
 >
-> **Username:** `antibody`  
+> **Username:** `antibody`<br>
 > **Password:** `A7_IN4ymCfw5M8lU3HBGkT_9VsFM9_x0`
 >
 > These credentials are deliberately public for this shared demo environment. Use controlled examples only; do not enter confidential source code or production secrets. The free service can take about a minute to wake after inactivity.
