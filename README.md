@@ -4,6 +4,15 @@
 
 Antibody turns a confirmed incident into a reviewable Semgrep detector. Validate the known failure and its fix, inspect matches in supplied source, approve the evidence, and export or propose a GitLab prevention check.
 
+> [!IMPORTANT]
+> ## Public demo access
+> Open the live workspace at [antibody-workspace.onrender.com/app](https://antibody-workspace.onrender.com/app).
+>
+> **Username:** `antibody`  
+> **Password:** `A7_IN4ymCfw5M8lU3HBGkT_9VsFM9_x0`
+>
+> These credentials are deliberately public for this shared demo environment. Use controlled examples only; do not enter confidential source code or production secrets. The free service can take about a minute to wake after inactivity.
+
 ## What works
 
 - Persistent incident history and validation evidence in SQLite locally or PostgreSQL when hosted.
